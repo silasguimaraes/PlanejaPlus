@@ -7,6 +7,7 @@ Instruções rápidas:
 - Inicializar Git local (já feito): `git init`
 - Adicionar remoto do GitHub: `git remote add origin <URL_DO_REPO>`
 - Enviar para o GitHub: `git push -u origin main`
+
 # Planeja+
 
 Projeto full stack de controle financeiro.
