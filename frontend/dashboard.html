@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Planeja+</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <!-- Cabecalho das paginas internas com link de logout. -->
+    <header class="topbar">
+      <a class="brand" href="./index.html">Planeja+</a>
+      <nav class="nav">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./movimentacoes.html">Movimentações</a>
+        <a href="./categorias.html">Categorias</a>
+        <a href="./relatorios.html">Relatórios</a>
+        <a href="./login.html" data-logout>Sair</a>
+      </nav>
+    </header>
+
+    <!-- Conteudo principal do dashboard financeiro. -->
+    <main class="container">
+      <!-- Titulo e descricao da tela. -->
+      <section class="page-heading">
+        <p class="eyebrow">Visão geral</p>
+        <h1>Dashboard financeiro</h1>
+        <p class="muted">Resumo financeiro calculado a partir das movimentações cadastradas.</p>
+      </section>
+
+      <!-- Cards preenchidos pelo dashboard.js com saldo, receitas e despesas. -->
+      <section class="stats-grid">
+        <article class="stat-card">
+          <p class="stat-label">Saldo atual</p>
+          <strong id="saldo-atual">R$ 0,00</strong>
+        </article>
+
+        <article class="stat-card">
+          <p class="stat-label">Receitas totais</p>
+          <strong id="receitas-totais" class="positive">R$ 0,00</strong>
+        </article>
+
+        <article class="stat-card">
+          <p class="stat-label">Despesas totais</p>
+          <strong id="despesas-totais" class="negative">R$ 0,00</strong>
+        </article>
+      </section>
+
+      <!-- Area com os graficos criados pela biblioteca Chart.js. -->
+      <section class="content-grid">
+        <article class="panel chart-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>Gastos por categoria</h2>
+              <p class="muted">Distribuição das despesas do período.</p>
+            </div>
+          </div>
+          <div class="chart-box pie-box">
+            <canvas id="grafico-categorias"></canvas>
+          </div>
+        </article>
+
+        <article class="panel chart-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>Resumo mensal</h2>
+              <p class="muted">Receitas e despesas por mês.</p>
+            </div>
+          </div>
+          <div class="chart-box">
+            <canvas id="grafico-mensal"></canvas>
+          </div>
+        </article>
+      </section>
+    </main>
+    <!-- Bibliotecas externas e scripts locais usados pelo dashboard. -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./js/apiService.js"></script>
+    <script src="./js/appUtils.js"></script>
+    <script src="./js/dashboard.js"></script>
+  </body>
+</html>

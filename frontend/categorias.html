@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Categorias | Planeja+</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <!-- Cabecalho das paginas autenticadas. -->
+    <header class="topbar">
+      <a class="brand" href="./index.html">Planeja+</a>
+      <nav class="nav">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./categorias.html">Categorias</a>
+        <a href="./movimentacoes.html">Movimentações</a>
+        <a href="./relatorios.html">Relatórios</a>
+        <a href="./login.html" data-logout>Sair</a>
+      </nav>
+    </header>
+
+    <!-- Grid com formulario de criacao e lista de categorias. -->
+    <main class="container grid">
+      <!-- Painel usado para cadastrar novas categorias. -->
+      <section class="panel">
+        <h1>Categorias</h1>
+        <p class="muted">Cadastre categorias de receita ou despesa.</p>
+
+        <!-- Formulario lido pelo categorias.js. -->
+        <form id="categoria-form" class="form">
+          <label>
+            Nome
+            <input name="nome" type="text" required />
+          </label>
+
+          <label>
+            Tipo
+            <select name="tipo" required>
+              <option value="despesa">Despesa</option>
+              <option value="receita">Receita</option>
+            </select>
+          </label>
+
+          <button class="button primary full" type="submit">Criar categoria</button>
+          <p id="message" class="message" role="status"></p>
+        </form>
+      </section>
+
+      <!-- Painel que recebe a lista renderizada pelo JavaScript. -->
+      <section class="panel">
+        <h2>Minhas categorias</h2>
+        <div id="categorias-lista" class="list"></div>
+      </section>
+    </main>
+    <!-- Dependencias e scripts da pagina de categorias. -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./js/apiService.js"></script>
+    <script src="./js/appUtils.js"></script>
+    <script src="./js/categorias.js"></script>
+  </body>
+</html>

@@ -1,0 +1,512 @@
+:root {
+  /* Variaveis globais para reaproveitar cores, sombra e superficies no projeto. */
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --line: #d8dee8;
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --danger: #dc2626;
+  --success: #15803d;
+  --shadow: 0 10px 30px rgba(31, 41, 55, 0.08);
+}
+
+/* Faz padding e borda entrarem no calculo total de largura dos elementos. */
+* {
+  box-sizing: border-box;
+}
+
+/* Estilos base do corpo da pagina. */
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Remove o visual padrao dos links para herdar o estilo do projeto. */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Barra superior usada em todas as paginas. */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 32px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Nome da marca exibido no cabecalho. */
+.brand {
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+/* Lista de links de navegacao. */
+.nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* Destaque visual quando o usuario passa o mouse em um link do menu. */
+.nav a:hover {
+  color: var(--primary);
+}
+
+/* Container central que limita a largura do conteudo. */
+.container {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+/* Layout principal da pagina inicial, com texto e painel lado a lado. */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.6fr);
+  align-items: start;
+  gap: 24px;
+}
+
+/* Espacamento do bloco textual da pagina inicial. */
+.hero-content {
+  padding: 48px 0;
+}
+
+/* Texto pequeno em destaque usado acima de titulos. */
+.eyebrow {
+  margin: 0 0 12px;
+  color: var(--primary);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+/* Regras compartilhadas para titulos. */
+h1,
+h2 {
+  margin: 0;
+  line-height: 1.1;
+}
+
+/* Limita o tamanho do titulo principal para facilitar a leitura. */
+h1 {
+  max-width: 720px;
+}
+
+/* Tamanho padrao dos subtitulos. */
+h2 {
+  font-size: 1.35rem;
+}
+
+/* Altura de linha padrao dos paragrafos. */
+p {
+  line-height: 1.6;
+}
+
+/* Textos secundarios usam cor mais suave. */
+.muted,
+.hero-content p {
+  color: var(--muted);
+}
+
+/* Painel reutilizavel para formularios, listas e graficos. */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+
+/* Ajusta o painel de resumo da pagina inicial. */
+.summary-panel {
+  margin-top: 48px;
+}
+
+/* Espacamento do bloco de titulo das paginas internas. */
+.page-heading {
+  margin-bottom: 24px;
+}
+
+/* Tamanho responsivo do titulo das paginas internas. */
+.page-heading h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+/* Container mais estreito usado nas paginas de login e cadastro. */
+.narrow {
+  max-width: 520px;
+}
+
+/* Grid de duas colunas usado em telas com formulario e lista. */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+/* Layout padrao de formularios. */
+.form {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+/* Linha de formulario com dois campos lado a lado. */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Label agrupa texto e campo, deixando o formulario mais organizado. */
+label {
+  display: grid;
+  gap: 8px;
+  color: #374151;
+  font-weight: 700;
+}
+
+/* Aparencia padrao dos campos de texto e selecao. */
+input,
+select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+}
+
+/* Indica qual campo esta ativo no teclado ou mouse. */
+input:focus,
+select:focus {
+  outline: 3px solid rgba(37, 99, 235, 0.18);
+  border-color: var(--primary);
+}
+
+/* Agrupa botoes e links de acao. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* Remove margem extra quando as acoes ficam dentro de cards compactos. */
+.actions.compact {
+  margin-top: 0;
+}
+
+/* Estilo base de todos os botoes. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+/* Botao principal para a acao mais importante da tela. */
+.button.primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Estado visual do botao principal ao passar o mouse. */
+.button.primary:hover {
+  background: var(--primary-dark);
+}
+
+/* Botao secundario para acoes alternativas. */
+.button.secondary {
+  background: #fff;
+  color: var(--text);
+  border-color: var(--line);
+}
+
+/* Botao de perigo usado em exclusoes. */
+.button.danger {
+  background: #fff;
+  color: var(--danger);
+  border-color: #fecaca;
+}
+
+/* Botao ocupando toda a largura do formulario. */
+.button.full {
+  width: 100%;
+}
+
+/* Area onde mensagens de sucesso e erro aparecem. */
+.message {
+  min-height: 24px;
+  margin: 0;
+  font-weight: 700;
+}
+
+/* Cor usada para mensagens de erro. */
+.message.error {
+  color: var(--danger);
+}
+
+/* Cor usada para mensagens de sucesso. */
+.message.success {
+  color: var(--success);
+}
+
+/* Lista vertical de cards renderizados pelo JavaScript. */
+.list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+/* Card individual para categoria ou movimentacao. */
+.item {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: #fff;
+}
+
+/* Cabecalho interno do card, separando texto e marcador. */
+.item-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Permite que textos longos quebrem dentro do card. */
+.item-header > div {
+  min-width: 0;
+}
+
+/* Titulo principal de cada item da lista. */
+.item-title {
+  margin: 0;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Valor financeiro exibido em uma movimentacao. */
+.item-value {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+/* Texto auxiliar de data, id ou categoria. */
+.item-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* Etiqueta visual usada para mostrar o tipo receita/despesa. */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+/* Versao verde da etiqueta para receitas. */
+.tag.success-soft {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* Versao vermelha da etiqueta para despesas. */
+.tag.danger-soft {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Cor padrao para valores positivos. */
+.positive {
+  color: var(--success);
+}
+
+/* Cor padrao para valores negativos. */
+.negative {
+  color: var(--danger);
+}
+
+/* Mensagem de estado vazio em listas. */
+.empty {
+  color: var(--muted);
+}
+
+/* Grid dos cards de resumo financeiro. */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* Card individual de indicador do dashboard ou relatorio. */
+.stat-card {
+  display: grid;
+  gap: 8px;
+  min-height: 120px;
+  padding: 22px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+/* Rotulo pequeno do card de indicador. */
+.stat-label {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* Valor numerico destacado dentro do card. */
+.stat-card strong {
+  font-size: 1.8rem;
+}
+
+/* Grid de duas colunas para graficos. */
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+/* Cabecalho interno de paineis com titulo e descricao. */
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+/* Ajusta a margem do texto secundario dentro do cabecalho do painel. */
+.panel-heading p {
+  margin: 8px 0 0;
+}
+
+/* Evita que o painel de grafico estoure a largura disponivel. */
+.chart-panel {
+  min-width: 0;
+}
+
+/* Define a area onde o canvas do grafico sera desenhado. */
+.chart-box {
+  position: relative;
+  height: 340px;
+  width: 100%;
+}
+
+/* Ajuste especifico para o grafico de pizza. */
+.pie-box {
+  height: 320px;
+}
+
+/* Grid dos filtros do relatorio. */
+.filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+
+/* Permite rolagem horizontal quando a tabela for maior que a tela. */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 18px;
+}
+
+/* Aparencia base da tabela de relatorios. */
+table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+}
+
+/* Espacamento e divisorias das celulas da tabela. */
+th,
+td {
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+/* Estilo dos cabecalhos da tabela. */
+th {
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+/* Regras aplicadas em telas pequenas, como celulares. */
+@media (max-width: 800px) {
+  /* Transforma layouts de varias colunas em uma coluna para caber no mobile. */
+  .topbar,
+  .hero,
+  .grid,
+  .form-row,
+  .stats-grid,
+  .content-grid,
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
+  /* No mobile o cabecalho vira grid para empilhar marca e menu. */
+  .topbar {
+    display: grid;
+    padding: 16px;
+  }
+
+  /* Reduz o espaco superior do bloco inicial em telas menores. */
+  .hero-content {
+    padding: 20px 0 0;
+  }
+
+  /* Remove margem extra do painel de resumo no mobile. */
+  .summary-panel {
+    margin-top: 0;
+  }
+
+  /* Reduz altura dos graficos para melhor encaixe em telas pequenas. */
+  .chart-box,
+  .pie-box {
+    height: 280px;
+  }
+}

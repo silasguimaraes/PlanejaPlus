@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Relatorios | Planeja+</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <!-- Cabecalho das paginas internas com link para sair. -->
+    <header class="topbar">
+      <a class="brand" href="./index.html">Planeja+</a>
+      <nav class="nav">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./movimentacoes.html">Movimentações</a>
+        <a href="./categorias.html">Categorias</a>
+        <a href="./relatorios.html">Relatórios</a>
+        <a href="./login.html" data-logout>Sair</a>
+      </nav>
+    </header>
+
+    <!-- Conteudo principal de filtros, resumo e tabela do relatorio. -->
+    <main class="container">
+      <!-- Titulo e descricao da pagina de relatorios. -->
+      <section class="page-heading">
+        <p class="eyebrow">Analise</p>
+        <h1>Relatorios</h1>
+        <p class="muted">Filtre as movimentações por período e exporte o resumo em PDF.</p>
+      </section>
+
+      <!-- Formulario de filtros usado pelo relatorios.js. -->
+      <section class="panel">
+        <form class="filters">
+          <label>
+            Data inicial
+            <input id="periodo-inicio" type="date" value="2026-05-01" />
+          </label>
+
+          <label>
+            Data final
+            <input id="periodo-fim" type="date" value="2026-05-31" />
+          </label>
+
+          <label>
+            Tipo
+            <select id="relatorio-tipo">
+              <option value="todos">Todos</option>
+              <option value="receita">Receitas</option>
+              <option value="despesa">Despesas</option>
+            </select>
+          </label>
+
+          <button class="button primary" type="submit">Gerar relatorio</button>
+          <button id="exportar-pdf" class="button secondary" type="button">Exportar PDF</button>
+        </form>
+      </section>
+
+      <!-- Cards de totais atualizados conforme o filtro do relatorio. -->
+      <section class="stats-grid">
+        <article class="stat-card">
+          <p class="stat-label">Total de receitas</p>
+          <strong id="relatorio-receitas" class="positive">R$ 4.500,00</strong>
+        </article>
+
+        <article class="stat-card">
+          <p class="stat-label">Total de despesas</p>
+          <strong id="relatorio-despesas" class="negative">R$ 659,75</strong>
+        </article>
+
+        <article class="stat-card">
+          <p class="stat-label">Resultado</p>
+          <strong id="relatorio-saldo">R$ 3.840,25</strong>
+        </article>
+      </section>
+
+      <!-- Tabela de detalhamento agrupado por categoria e tipo. -->
+      <section class="panel">
+        <h2>Detalhamento</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Categoria</th>
+                <th>Tipo</th>
+                <th>Quantidade</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="relatorio-detalhes"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <!-- Bibliotecas externas e scripts locais usados no relatorio. -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="./js/apiService.js"></script>
+    <script src="./js/appUtils.js"></script>
+    <script src="./js/relatorios.js"></script>
+  </body>
+</html>

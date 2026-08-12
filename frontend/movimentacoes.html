@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movimentacoes | Planeja+</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <!-- Cabecalho das paginas internas com navegacao entre modulos. -->
+    <header class="topbar">
+      <a class="brand" href="./index.html">Planeja+</a>
+      <nav class="nav">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./categorias.html">Categorias</a>
+        <a href="./movimentacoes.html">Movimentações</a>
+        <a href="./relatorios.html">Relatórios</a>
+        <a href="./login.html" data-logout>Sair</a>
+      </nav>
+    </header>
+
+    <!-- Grid principal com formulario e lista de movimentacoes. -->
+    <main class="container grid">
+      <!-- Painel do formulario para criar ou editar movimentacoes. -->
+      <section class="panel">
+        <h1>Movimentacoes</h1>
+        <p class="muted">Crie, edite e exclua entradas financeiras.</p>
+
+        <!-- Formulario controlado pelo movimentacoes.js. -->
+        <form id="movimentacao-form" class="form">
+          <input name="id" type="hidden" />
+
+          <label>
+            Categoria
+            <select name="categoria_id" required></select>
+          </label>
+
+          <label>
+            Descricao
+            <input name="descricao" type="text" required />
+          </label>
+
+          <div class="form-row">
+            <label>
+              Valor
+              <input name="valor" type="number" step="0.01" min="0.01" required />
+            </label>
+
+            <label>
+              Tipo
+              <select name="tipo" required>
+                <option value="despesa">Despesa</option>
+                <option value="receita">Receita</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            Data
+            <input name="data_movimentacao" type="date" required />
+          </label>
+
+          <div class="actions compact">
+            <button class="button primary" type="submit">Salvar</button>
+            <button id="cancelar-edicao" class="button secondary" type="button">Limpar</button>
+          </div>
+          <p id="message" class="message" role="status"></p>
+        </form>
+      </section>
+
+      <!-- Painel onde os cards de movimentacoes sao inseridos pelo JavaScript. -->
+      <section class="panel">
+        <h2>Minhas movimentações</h2>
+        <div id="movimentacoes-lista" class="list"></div>
+      </section>
+    </main>
+    <!-- Dependencias e scripts da tela de movimentacoes. -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./js/apiService.js"></script>
+    <script src="./js/appUtils.js"></script>
+    <script src="./js/movimentacoes.js"></script>
+  </body>
+</html>

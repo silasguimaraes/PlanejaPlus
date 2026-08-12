@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Planeja+</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <!-- Cabecalho simples da tela de login. -->
+    <header class="topbar">
+      <a class="brand" href="./index.html">Planeja+</a>
+      <nav class="nav">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./cadastro.html">Cadastro</a>
+      </nav>
+    </header>
+
+    <!-- Container estreito para centralizar o formulario de entrada. -->
+    <main class="container narrow">
+      <!-- Painel visual que agrupa titulo, texto e formulario. -->
+      <section class="panel">
+        <h1>Entrar</h1>
+        <p class="muted">Acesse com email e senha cadastrados.</p>
+
+        <!-- Formulario que envia email e senha para o script login.js. -->
+        <form id="login-form" class="form">
+          <label>
+            Email
+            <input name="email" type="email" required />
+          </label>
+
+          <label>
+            Senha
+            <input name="senha" type="password" required />
+          </label>
+
+          <button class="button primary full" type="submit">Entrar</button>
+          <p id="message" class="message" role="status"></p>
+        </form>
+      </section>
+    </main>
+    <!-- Bibliotecas e scripts carregados no fim para encontrar o HTML ja montado. -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./js/apiService.js"></script>
+    <script src="./js/appUtils.js"></script>
+    <script src="./js/login.js"></script>
+  </body>
+</html>

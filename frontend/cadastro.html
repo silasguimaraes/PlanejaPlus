@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro | Planeja+</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <!-- Cabecalho com links para navegar entre cadastro, login e dashboard. -->
+    <header class="topbar">
+      <a class="brand" href="./index.html">Planeja+</a>
+      <nav class="nav">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./login.html">Login</a>
+      </nav>
+    </header>
+
+    <!-- Area principal com largura reduzida para focar no formulario. -->
+    <main class="container narrow">
+      <!-- Painel que agrupa as informacoes de criacao de conta. -->
+      <section class="panel">
+        <h1>Criar conta</h1>
+        <p class="muted">Preencha seus dados para acessar o Planeja+.</p>
+
+        <!-- Formulario lido pelo cadastro.js para enviar os dados ao backend. -->
+        <form id="cadastro-form" class="form">
+          <label>
+            Nome
+            <input name="nome" type="text" required />
+          </label>
+
+          <label>
+            Email
+            <input name="email" type="email" required />
+          </label>
+
+          <label>
+            Senha
+            <input name="senha" type="password" required minlength="6" />
+          </label>
+
+          <button class="button primary full" type="submit">Cadastrar</button>
+          <p id="message" class="message" role="status"></p>
+        </form>
+      </section>
+    </main>
+    <!-- Dependencias e scripts da pagina. -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./js/apiService.js"></script>
+    <script src="./js/appUtils.js"></script>
+    <script src="./js/cadastro.js"></script>
+  </body>
+</html>
