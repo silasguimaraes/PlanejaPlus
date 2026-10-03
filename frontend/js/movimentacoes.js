@@ -22,7 +22,7 @@ function renderCategorias(categorias) {
   }
 
   categoriaSelect.innerHTML = categorias
-    .map((categoria) => `<option value="${categoria.id}">${categoria.nome}</option>`)
+    .map((categoria) => `<option value="${categoria.id}">${window.AppUtils.escapeHtml(categoria.nome)}</option>`)
     .join('');
 }
 
@@ -43,15 +43,15 @@ function renderMovimentacoes(movimentacoes) {
         <article class="item">
           <div class="item-header">
             <div>
-              <p class="item-title">${movimentacao.descricao}</p>
+              <p class="item-title">${window.AppUtils.escapeHtml(movimentacao.descricao)}</p>
               <p class="item-meta">
-                ${movimentacao.categoria_nome} - ${window.AppUtils.formatDate(
+                ${window.AppUtils.escapeHtml(movimentacao.categoria_nome)} - ${window.AppUtils.formatDate(
                   movimentacao.data_movimentacao,
                 )}
               </p>
             </div>
             <span class="tag ${movimentacao.tipo === 'receita' ? 'success-soft' : 'danger-soft'}">
-              ${movimentacao.tipo}
+              ${window.AppUtils.escapeHtml(movimentacao.tipo)}
             </span>
           </div>
           <p class="item-value ${movimentacao.tipo === 'receita' ? 'positive' : 'negative'}">

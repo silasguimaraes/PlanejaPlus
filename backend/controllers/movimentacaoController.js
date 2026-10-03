@@ -1,23 +1,36 @@
 import Movimentacao from '../models/Movimentacao.js';
 
+function validarDadosMovimentacao({ categoria_id, descricao, valor, tipo, data_movimentacao }) {
+  const data = typeof data_movimentacao === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(data_movimentacao)
+    ? new Date(`${data_movimentacao}T00:00:00.000Z`)
+    : null;
+  const dataValida = data && !Number.isNaN(data.valueOf()) &&
+    data.toISOString().slice(0, 10) === data_movimentacao;
+
+  return Number.isInteger(Number(categoria_id)) && Number(categoria_id) > 0 &&
+    typeof descricao === 'string' && descricao.trim().length > 0 && descricao.length <= 180 &&
+    Number.isFinite(Number(valor)) && Number(valor) > 0 &&
+    ['receita', 'despesa'].includes(tipo) && dataValida;
+}
+
 // Controller que cria uma nova movimentacao financeira.
 export async function criarMovimentacao(req, res) {
   // Campos enviados pelo formulario de movimentacoes.
   const { categoria_id, descricao, valor, tipo, data_movimentacao } = req.body || {};
 
   // Valida se todos os campos obrigatorios foram preenchidos.
-  if (!categoria_id || !descricao || !valor || !tipo || !data_movimentacao) {
+  if (!validarDadosMovimentacao({ categoria_id, descricao, valor, tipo, data_movimentacao })) {
     return res.status(400).json({
-      message: 'Categoria, descricao, valor, tipo e data_movimentacao sao obrigatorios.',
+      message: 'Informe categoria, descricao, valor positivo, tipo valido e data correta.',
     });
   }
 
   // Cria a movimentacao ligada ao usuario autenticado.
   const movimentacao = await Movimentacao.create({
     usuarioId: req.usuario.id,
-    categoriaId: categoria_id,
-    descricao,
-    valor,
+    categoriaId: Number(categoria_id),
+    descricao: descricao.trim(),
+    valor: Number(valor),
     tipo,
     dataMovimentacao: data_movimentacao,
   });
@@ -45,9 +58,9 @@ export async function editarMovimentacao(req, res) {
   const { categoria_id, descricao, valor, tipo, data_movimentacao } = req.body || {};
 
   // Mantem a mesma regra de campos obrigatorios usada na criacao.
-  if (!categoria_id || !descricao || !valor || !tipo || !data_movimentacao) {
+  if (!validarDadosMovimentacao({ categoria_id, descricao, valor, tipo, data_movimentacao })) {
     return res.status(400).json({
-      message: 'Categoria, descricao, valor, tipo e data_movimentacao sao obrigatorios.',
+      message: 'Informe categoria, descricao, valor positivo, tipo valido e data correta.',
     });
   }
 
@@ -55,9 +68,9 @@ export async function editarMovimentacao(req, res) {
   const movimentacao = await Movimentacao.update({
     id,
     usuarioId: req.usuario.id,
-    categoriaId: categoria_id,
-    descricao,
-    valor,
+    categoriaId: Number(categoria_id),
+    descricao: descricao.trim(),
+    valor: Number(valor),
     tipo,
     dataMovimentacao: data_movimentacao,
   });

@@ -12,6 +12,7 @@
     "cors": "latest",
     "dotenv": "latest",
     "express": "latest",
+    "express-rate-limit": "^8.7.0",
     "jsonwebtoken": "latest",
     "mysql2": "latest"
   },

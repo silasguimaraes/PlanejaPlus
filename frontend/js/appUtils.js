@@ -8,6 +8,16 @@ function getApiError(error) {
   return error.response?.data?.message || error.message || 'Erro inesperado.';
 }
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character]);
+}
+
 // Mostra mensagens de sucesso ou erro no elemento #message da pagina.
 function showMessage(text, type = 'success') {
   const message = document.querySelector('#message');
@@ -75,6 +85,7 @@ function toInputDate(value) {
 window.AppUtils = {
   formatCurrency,
   formatDate,
+  escapeHtml,
   getApiError,
   getFormData,
   requireAuth,

@@ -1,13 +1,15 @@
 import cors from 'cors';
 import express from 'express';
+import { env } from './config/env.js';
 import { errorMiddleware } from './middleware/errorMiddleware.js';
 import routes from './routes/index.js';
 
 // Cria a aplicacao Express; e aqui que configuramos tudo que o servidor vai usar.
 const app = express();
+app.set('trust proxy', 1);
 
 // Libera chamadas do frontend, que normalmente roda em outra origem durante o desenvolvimento.
-app.use(cors());
+app.use(cors({ origin: env.frontendOrigins }));
 
 // Ensina o Express a ler dados enviados em JSON no corpo das requisicoes.
 app.use(express.json());

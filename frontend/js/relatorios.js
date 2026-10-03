@@ -2,6 +2,8 @@
 const relatorioForm = document.querySelector('.filters');
 const exportarPdfButton = document.querySelector('#exportar-pdf');
 const detalhesTabela = document.querySelector('#relatorio-detalhes');
+const periodoInicioInput = document.querySelector('#periodo-inicio');
+const periodoFimInput = document.querySelector('#periodo-fim');
 
 // Guarda as movimentacoes carregadas para filtrar sem consultar a API toda hora.
 let movimentacoesRelatorio = [];
@@ -9,6 +11,18 @@ let movimentacoesRelatorio = [];
 // Formata datas dos inputs para aparecerem de forma amigavel no PDF.
 function formatarDataInput(data) {
   return new Date(`${data}T00:00:00`).toLocaleDateString('pt-BR');
+}
+
+function definirPeriodoInicial() {
+  const hoje = new Date();
+  const formatarInput = (data) => [
+    data.getFullYear(),
+    String(data.getMonth() + 1).padStart(2, '0'),
+    String(data.getDate()).padStart(2, '0'),
+  ].join('-');
+
+  periodoInicioInput.value = formatarInput(new Date(hoje.getFullYear(), hoje.getMonth(), 1));
+  periodoFimInput.value = formatarInput(hoje);
 }
 
 // Aplica os filtros de periodo e tipo sobre as movimentacoes carregadas.
@@ -45,27 +59,28 @@ function calcularResumo(movimentacoes) {
 
 // Agrupa movimentacoes por categoria e tipo para montar o detalhamento.
 function agruparDetalhes(movimentacoes) {
-  const grupos = {};
+  const grupos = new Map();
 
   movimentacoes.forEach((item) => {
-    const chave = `${item.categoria_nome}-${item.tipo}`;
+    const chave = JSON.stringify([item.categoria_nome, item.tipo]);
 
     // Cria o grupo quando a categoria ainda nao apareceu.
-    if (!grupos[chave]) {
-      grupos[chave] = {
+    if (!grupos.has(chave)) {
+      grupos.set(chave, {
         categoria: item.categoria_nome || 'Sem categoria',
         tipo: item.tipo,
         quantidade: 0,
         total: 0,
-      };
+      });
     }
 
     // Atualiza quantidade e valor total do grupo.
-    grupos[chave].quantidade += 1;
-    grupos[chave].total += Number(item.valor);
+    const grupo = grupos.get(chave);
+    grupo.quantidade += 1;
+    grupo.total += Number(item.valor);
   });
 
-  return Object.values(grupos);
+  return [...grupos.values()];
 }
 
 // Atualiza os cards de resumo do relatorio.
@@ -96,8 +111,8 @@ function renderDetalhes(detalhes) {
     .map(
       (item) => `
         <tr>
-          <td>${item.categoria}</td>
-          <td>${item.tipo}</td>
+          <td>${window.AppUtils.escapeHtml(item.categoria)}</td>
+          <td>${window.AppUtils.escapeHtml(item.tipo)}</td>
           <td>${item.quantidade}</td>
           <td>${window.AppUtils.formatCurrency(item.total)}</td>
         </tr>
@@ -175,9 +190,11 @@ function exportarRelatorioPdf() {
 async function carregarRelatorio() {
   try {
     movimentacoesRelatorio = await window.ApiService.listarMovimentacoes();
+    exportarPdfButton.disabled = false;
     atualizarRelatorio();
   } catch (error) {
     console.error(window.AppUtils.getApiError(error));
+    window.AppUtils.showMessage(window.AppUtils.getApiError(error), 'error');
   }
 }
 
@@ -191,6 +208,8 @@ relatorioForm.addEventListener('submit', (event) => {
 exportarPdfButton.addEventListener('click', exportarRelatorioPdf);
 
 // Protege a pagina, prepara logout e carrega dados iniciais.
+definirPeriodoInicial();
+exportarPdfButton.disabled = true;
 window.AppUtils.requireAuth();
 window.AppUtils.setupLogout();
 carregarRelatorio();

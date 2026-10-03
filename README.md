@@ -1,13 +1,3 @@
-# PlanejaPlus
-
-Repositório para o projeto PlanejaPlus (baseado em PlanejaMais).
-
-Instruções rápidas:
-
-- Inicializar Git local (já feito): `git init`
-- Adicionar remoto do GitHub: `git remote add origin <URL_DO_REPO>`
-- Enviar para o GitHub: `git push -u origin main`
-
 # Planeja+
 
 Projeto full stack de controle financeiro.
@@ -82,8 +72,10 @@ Edite `backend/.env` com suas credenciais do MySQL:
 
 ```env
 PORT=3000
-JWT_SECRET=troque_este_segredo_em_producao
+JWT_SECRET=
 JWT_EXPIRES_IN=1d
+ALLOW_PUBLIC_REGISTRATION=true
+FRONTEND_ORIGINS=http://localhost:5500
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
@@ -91,11 +83,20 @@ DB_PASSWORD=sua_senha
 DB_NAME=planeja_plus
 ```
 
-Crie o banco e as tabelas:
+Crie o banco local (se ainda nao existir) e as tabelas. O schema nao apaga tabelas nem insere dados de exemplo:
 
 ```bash
-mysql -u root -p < database/schema.sql
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS planeja_plus"
+mysql -u root -p planeja_plus < database/schema.sql
 ```
+
+No Windows PowerShell, a importacao pode ser feita pelo `cmd`:
+
+```powershell
+cmd /c "mysql -u root -p planeja_plus < database\schema.sql"
+```
+
+`CREATE TABLE IF NOT EXISTS` protege tabelas existentes contra recriacao, mas nao atualiza estruturas antigas. Use migracoes versionadas para evoluir o schema e faça backup antes de qualquer alteracao estrutural.
 
 Inicie a API:
 
@@ -121,6 +122,8 @@ Teste rapido:
 GET http://localhost:3000/api/health
 ```
 
+O health check retorna `503` se o banco nao estiver acessivel.
+
 ## Rodar o frontend
 
 Com o backend ligado, abra `frontend/index.html` no navegador.
@@ -137,6 +140,14 @@ Acesse:
 ```text
 http://localhost:5500
 ```
+
+## Publicar a API
+
+- Configure no servico do backend `NODE_ENV=production`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` e `DB_NAME` com as credenciais do MySQL privado do provedor. Nao exponha a porta do banco publicamente.
+- Configure um `JWT_SECRET` aleatorio com pelo menos 32 caracteres, `ALLOW_PUBLIC_REGISTRATION=false` e `FRONTEND_ORIGINS` com a origem HTTPS exata do frontend.
+- O cadastro retorna 403 por padrao em producao. Login e cadastro possuem limites de tentativas por IP.
+- Hospede o frontend por HTTPS e edite `frontend/js/api-config.js`: defina `API_BASE_URL` como a URL HTTPS da API terminada em `/api`.
+- O `schema.sql` somente cria tabelas ausentes e nao importa usuarios/categorias de exemplo. Nao o aplique sobre um banco sem backup.
 
 ## Fluxo de uso
 

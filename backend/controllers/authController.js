@@ -17,6 +17,10 @@ function createToken(usuario) {
 
 // Controller responsavel por criar uma nova conta de usuario.
 export async function cadastro(req, res) {
+  if (!env.allowPublicRegistration) {
+    return res.status(403).json({ message: 'Cadastro publico desativado.' });
+  }
+
   // Extrai os campos enviados pelo frontend no corpo da requisicao.
   const { nome, email, senha } = req.body || {};
 

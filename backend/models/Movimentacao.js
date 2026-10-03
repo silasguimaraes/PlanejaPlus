@@ -9,8 +9,8 @@ class Movimentacao {
         (usuario_id, categoria_id, descricao, valor, tipo, data_movimentacao)
        SELECT ?, categorias.id, ?, ?, ?, ?
        FROM categorias
-       WHERE categorias.id = ? AND categorias.usuario_id = ?`,
-      [usuarioId, descricao, valor, tipo, dataMovimentacao, categoriaId, usuarioId],
+      WHERE categorias.id = ? AND categorias.usuario_id = ? AND categorias.tipo = ?`,
+          [usuarioId, descricao, valor, tipo, dataMovimentacao, categoriaId, usuarioId, tipo],
     );
 
     // affectedRows igual a zero indica que a categoria nao foi encontrada para esse usuario.
@@ -80,11 +80,21 @@ class Movimentacao {
     tipo,
     dataMovimentacao,
   }) {
-    const [result] = await pool.execute(
+    const [categorias] = await pool.execute(
+      'SELECT id FROM categorias WHERE id = ? AND usuario_id = ? AND tipo = ? LIMIT 1',
+      [categoriaId, usuarioId, tipo],
+    );
+
+    if (!categorias.length) {
+      return null;
+    }
+
+    await pool.execute(
       `UPDATE movimentacoes
        INNER JOIN categorias
         ON categorias.id = ?
         AND categorias.usuario_id = movimentacoes.usuario_id
+        AND categorias.tipo = ?
        SET
         movimentacoes.categoria_id = categorias.id,
         movimentacoes.descricao = ?,
@@ -92,14 +102,10 @@ class Movimentacao {
         movimentacoes.tipo = ?,
         movimentacoes.data_movimentacao = ?
        WHERE movimentacoes.id = ? AND movimentacoes.usuario_id = ?`,
-      [categoriaId, descricao, valor, tipo, dataMovimentacao, id, usuarioId],
+      [categoriaId, tipo, descricao, valor, tipo, dataMovimentacao, id, usuarioId],
     );
 
-    // Se nada foi alterado, a movimentacao nao existe ou a categoria nao e valida.
-    if (result.affectedRows === 0) {
-      return null;
-    }
-
+    // Uma atualizacao identica pode ter zero linhas alteradas no MySQL, mas continuar valida.
     return this.findByIdAndUsuario({ id, usuarioId });
   }
 

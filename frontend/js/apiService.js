@@ -1,6 +1,6 @@
 // Cria uma instancia do Axios com a URL base da API.
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: window.API_BASE_URL || 'http://localhost:3000/api',
   headers: {
     'Content-Type': 'application/json',
   },

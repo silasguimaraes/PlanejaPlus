@@ -16,9 +16,9 @@ function renderCategorias(categorias) {
       (categoria) => `
         <article class="item">
           <div class="item-header">
-            <p class="item-title">${categoria.nome}</p>
+            <p class="item-title">${window.AppUtils.escapeHtml(categoria.nome)}</p>
             <span class="tag ${categoria.tipo === 'receita' ? 'success-soft' : 'danger-soft'}">
-              ${categoria.tipo}
+              ${window.AppUtils.escapeHtml(categoria.tipo)}
             </span>
           </div>
           <p class="item-meta">ID: ${categoria.id}</p>
