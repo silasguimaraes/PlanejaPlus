@@ -1,6 +1,6 @@
 # Planeja+
 
-Projeto full stack de controle financeiro.
+
 
 - Frontend: HTML, CSS e JavaScript
 - Backend: Node.js + Express
@@ -12,7 +12,6 @@ Projeto full stack de controle financeiro.
 - npm
 - MySQL rodando localmente
 - Navegador moderno
-- Conexao com internet para carregar CDNs do frontend:
   - Axios
   - Chart.js
   - jsPDF
