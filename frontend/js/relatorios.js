@@ -211,5 +211,6 @@ exportarPdfButton.addEventListener('click', exportarRelatorioPdf);
 definirPeriodoInicial();
 exportarPdfButton.disabled = true;
 window.AppUtils.requireAuth();
+window.AppUtils.setupAdminLink();
 window.AppUtils.setupLogout();
 carregarRelatorio();

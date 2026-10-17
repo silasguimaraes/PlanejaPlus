@@ -181,5 +181,6 @@ async function carregarDashboard() {
 
 // Protege a pagina, ativa logout e inicia o carregamento do dashboard.
 window.AppUtils.requireAuth();
+window.AppUtils.setupAdminLink();
 window.AppUtils.setupLogout();
 carregarDashboard();

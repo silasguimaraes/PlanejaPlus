@@ -57,5 +57,6 @@ categoriaForm.addEventListener('submit', async (event) => {
 
 // Protege a pagina, prepara o botao de sair e carrega os dados iniciais.
 window.AppUtils.requireAuth();
+window.AppUtils.setupAdminLink();
 window.AppUtils.setupLogout();
 carregarCategorias();

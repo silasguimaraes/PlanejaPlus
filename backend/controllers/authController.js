@@ -9,6 +9,8 @@ function createToken(usuario) {
     {
       id: usuario.id,
       email: usuario.email,
+      perfil: usuario.perfil || 'usuario',
+      ativo: usuario.ativo ?? true,
     },
     env.jwtSecret,
     { expiresIn: env.jwtExpiresIn },
@@ -29,16 +31,38 @@ export async function cadastro(req, res) {
     return res.status(400).json({ message: 'Nome, email e senha sao obrigatorios.' });
   }
 
+//VALIDAÇÂO BACKEND
+
+
+  if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return res.status(400).json({ message: 'Informe um email valido com @ e dominio.' });
+  }
+
+  if (typeof senha !== 'string' || [...senha].length < 8) {
+    return res.status(400).json({ message: 'A senha deve ter pelo menos 8 caracteres.' });
+  }
+
+  if (!/[\p{P}\p{S}]/u.test(senha)) {
+    return res.status(400).json({ message: 'A senha deve conter pelo menos um caractere especial.' });
+  }
+
   // Criptografa a senha para que ela nao seja salva em texto puro.
   const senhaHash = await bcrypt.hash(senha, 10);
 
   // Salva o usuario no banco e gera um token para login automatico apos o cadastro.
   const usuario = await Usuario.create({ nome, email, senha: senhaHash });
-  const token = createToken(usuario);
+  const usuarioSeguro = {
+    id: usuario.id,
+    nome: usuario.nome,
+    email: usuario.email,
+    perfil: usuario.perfil,
+    ativo: Boolean(usuario.ativo),
+  };
+  const token = createToken(usuarioSeguro);
 
   // Retorna status 201 porque um novo recurso foi criado.
   return res.status(201).json({
-    usuario,
+    usuario: usuarioSeguro,
     token,
   });
 }
@@ -68,15 +92,18 @@ export async function login(req, res) {
   }
 
   // Gera um token para o frontend guardar e usar nas rotas protegidas.
-  const token = createToken(usuario);
+  const usuarioSeguro = {
+    id: usuario.id,
+    nome: usuario.nome,
+    email: usuario.email,
+    perfil: usuario.perfil,
+    ativo: Boolean(usuario.ativo),
+  };
+  const token = createToken(usuarioSeguro);
 
   // Retorna apenas dados seguros do usuario, sem expor a senha.
   return res.json({
-    usuario: {
-      id: usuario.id,
-      nome: usuario.nome,
-      email: usuario.email,
-    },
+    usuario: usuarioSeguro,
     token,
   });
 }

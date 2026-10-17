@@ -157,6 +157,14 @@ http://localhost:5500
 5. Veja os graficos em `dashboard.html`.
 6. Gere PDF em `relatorios.html`.
 
+## Validacao de cadastro
+
+As regras sao verificadas pelo backend na rota `POST /api/auth/cadastro`, mesmo que a requisicao seja enviada sem usar as telas do frontend:
+
+- O email deve ter um formato basico valido, com `@` e dominio.
+- A senha deve ter pelo menos 8 caracteres e incluir ao menos um caractere especial (simbolo ou pontuacao).
+- Dados invalidos retornam status HTTP `400` com uma mensagem indicando o problema.
+
 O token JWT fica salvo no `localStorage` com a chave:
 
 ```text

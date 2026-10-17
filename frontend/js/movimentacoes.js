@@ -152,6 +152,7 @@ cancelarEdicaoButton.addEventListener('click', resetForm);
 
 // Protege a pagina, ativa logout, prepara o formulario e carrega dados.
 window.AppUtils.requireAuth();
+window.AppUtils.setupAdminLink();
 window.AppUtils.setupLogout();
 resetForm();
 carregarDados();

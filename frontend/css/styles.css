@@ -246,6 +246,13 @@ select:focus {
   border-color: var(--line);
 }
 
+/* Versao compacta dos botoes usados em tabelas e listas curtas. */
+.button.small {
+  min-height: 34px;
+  padding: 7px 12px;
+  font-size: 0.85rem;
+}
+
 /* Botao de perigo usado em exclusoes. */
 .button.danger {
   background: #fff;
@@ -347,10 +354,21 @@ select:focus {
   color: #166534;
 }
 
+/* Versao roxa da etiqueta para perfis de administrador. */
+.tag.admin-soft {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
 /* Versao vermelha da etiqueta para despesas. */
 .tag.danger-soft {
   background: #fee2e2;
   color: #991b1b;
+}
+
+/* Linhas de usuarios inativos recebem destaque discreto. */
+tr.inativo {
+  opacity: 0.7;
 }
 
 /* Cor padrao para valores positivos. */

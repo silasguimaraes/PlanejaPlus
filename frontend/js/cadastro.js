@@ -15,6 +15,7 @@ if (!window.PUBLIC_REGISTRATION_ENABLED) {
       const dados = window.AppUtils.getFormData(cadastroForm);
       const response = await window.ApiService.cadastro(dados);
 
+      window.AppUtils.setCurrentUser(response.usuario);
       localStorage.setItem('planeja_token', response.token);
       window.location.href = './dashboard.html';
     } catch (error) {

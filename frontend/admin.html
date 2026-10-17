@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin | Planeja+</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="./index.html">Planeja+</a>
+      <nav class="nav">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./movimentacoes.html">Movimentações</a>
+        <a href="./categorias.html">Categorias</a>
+        <a href="./relatorios.html">Relatórios</a>
+        <a href="./admin.html" data-admin-link>Admin</a>
+        <a href="./login.html" data-logout>Sair</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section class="page-heading">
+        <p class="eyebrow">Administração</p>
+        <h1>Painel do administrador</h1>
+        <p class="muted">Acompanhe os totais da plataforma e gerencie os usuários.</p>
+      </section>
+
+      <section class="stats-grid admin-stats">
+        <article class="stat-card">
+          <p class="stat-label">Usuários</p>
+          <strong id="total-usuarios">0</strong>
+        </article>
+        <article class="stat-card">
+          <p class="stat-label">Usuários ativos</p>
+          <strong id="usuarios-ativos">0</strong>
+        </article>
+        <article class="stat-card">
+          <p class="stat-label">Movimentações</p>
+          <strong id="total-movimentacoes">0</strong>
+        </article>
+        <article class="stat-card">
+          <p class="stat-label">Receitas totais</p>
+          <strong id="total-receitas" class="positive">R$ 0,00</strong>
+        </article>
+        <article class="stat-card">
+          <p class="stat-label">Despesas totais</p>
+          <strong id="total-despesas" class="negative">R$ 0,00</strong>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h2>Usuários</h2>
+        <p id="message" class="message" role="status"></p>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Perfil</th>
+                <th>Movim.</th>
+                <th>Cadastro</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="usuarios-tabela"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./js/api-config.js"></script>
+    <script src="./js/apiService.js"></script>
+    <script src="./js/appUtils.js"></script>
+    <script src="./js/admin.js"></script>
+  </body>
+</html>

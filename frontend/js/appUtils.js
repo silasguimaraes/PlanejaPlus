@@ -39,9 +39,39 @@ function requireAuth() {
   }
 }
 
+function getCurrentUser() {
+  try {
+    const raw = localStorage.getItem('planeja_user');
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function setCurrentUser(user) {
+  if (!user) {
+    localStorage.removeItem('planeja_user');
+    return;
+  }
+
+  localStorage.setItem('planeja_user', JSON.stringify(user));
+}
+
+function setupAdminLink() {
+  const adminLink = document.querySelector('[data-admin-link]');
+  if (!adminLink) {
+    return;
+  }
+
+  const user = getCurrentUser();
+  const isAdmin = user?.perfil === 'admin' && user?.ativo !== false;
+  adminLink.hidden = !isAdmin;
+}
+
 // Remove o token salvo e leva o usuario de volta para a tela de login.
 function logout() {
   localStorage.removeItem('planeja_token');
+  localStorage.removeItem('planeja_user');
   window.location.href = './login.html';
 }
 
@@ -88,7 +118,10 @@ window.AppUtils = {
   escapeHtml,
   getApiError,
   getFormData,
+  getCurrentUser,
   requireAuth,
+  setCurrentUser,
+  setupAdminLink,
   setupLogout,
   showMessage,
   toInputDate,

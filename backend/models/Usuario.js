@@ -14,13 +14,15 @@ class Usuario {
       id: result.insertId,
       nome,
       email,
+      perfil: 'usuario',
+      ativo: true,
     };
   }
 
   // Busca um usuario pelo email para permitir a validacao do login.
   static async findByEmail(email) {
     const [rows] = await pool.execute(
-      'SELECT id, nome, email, senha FROM usuarios WHERE email = ? LIMIT 1',
+      'SELECT id, nome, email, senha, perfil, ativo FROM usuarios WHERE email = ? LIMIT 1',
       [email],
     );
 

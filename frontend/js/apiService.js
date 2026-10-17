@@ -33,6 +33,29 @@ const ApiService = {
     return response.data;
   },
 
+  // Busca os totais gerais do painel administrativo.
+  async adminResumo() {
+    const response = await api.get('/admin/resumo');
+    return response.data;
+  },
+
+  // Lista todos os usuarios para o painel administrativo.
+  async adminListarUsuarios() {
+    const response = await api.get('/admin/usuarios');
+    return response.data;
+  },
+
+  // Atualiza perfil e status de um usuario pelo admin.
+  async adminAtualizarUsuario(id, dados) {
+    const response = await api.patch(`/admin/usuarios/${id}`, dados);
+    return response.data;
+  },
+
+  // Remove um usuario do sistema pelo admin.
+  async adminExcluirUsuario(id) {
+    await api.delete(`/admin/usuarios/${id}`);
+  },
+
   // Busca as movimentacoes do usuario logado.
   async listarMovimentacoes() {
     const response = await api.get('/movimentacoes');

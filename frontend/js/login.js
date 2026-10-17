@@ -10,6 +10,7 @@ loginForm.addEventListener('submit', async (event) => {
     const dados = window.AppUtils.getFormData(loginForm);
     const response = await window.ApiService.login(dados);
 
+    window.AppUtils.setCurrentUser(response.usuario);
     localStorage.setItem('planeja_token', response.token);
     window.location.href = './dashboard.html';
   } catch (error) {
