@@ -2,7 +2,7 @@
 export function errorMiddleware(err, req, res, next) {
   // ER_DUP_ENTRY acontece quando o MySQL bloqueia um valor repetido, como email duplicado.
   if (err.code === 'ER_DUP_ENTRY') {
-    return res.status(409).json({ message: 'Registro ja existente.' });
+    return res.status(409).json({ message: 'Registro já existente.' });
   }
 
   // Registra o erro completo no terminal para ajudar na investigacao durante o desenvolvimento.

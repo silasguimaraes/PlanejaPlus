@@ -7,14 +7,14 @@ export function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.status(401).json({ message: 'Token nao informado.' });
+    return res.status(401).json({ message: 'Token não informado.' });
   }
 
   // Separa a palavra Bearer do token real.
   const [, token] = authHeader.split(' ');
 
   if (!token) {
-    return res.status(401).json({ message: 'Token invalido.' });
+    return res.status(401).json({ message: 'Token inválido.' });
   }
 
   try {
@@ -23,6 +23,6 @@ export function authMiddleware(req, res, next) {
     return next();
   } catch {
     // Se o token estiver errado ou vencido, bloqueia o acesso.
-    return res.status(401).json({ message: 'Token invalido ou expirado.' });
+    return res.status(401).json({ message: 'Token inválido ou expirado.' });
   }
 }

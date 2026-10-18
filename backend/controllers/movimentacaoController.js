@@ -21,7 +21,7 @@ export async function criarMovimentacao(req, res) {
   // Valida se todos os campos obrigatorios foram preenchidos.
   if (!validarDadosMovimentacao({ categoria_id, descricao, valor, tipo, data_movimentacao })) {
     return res.status(400).json({
-      message: 'Informe categoria, descricao, valor positivo, tipo valido e data correta.',
+      message: 'Informe categoria, descrição, valor positivo, tipo válido e data correta.',
     });
   }
 
@@ -37,7 +37,7 @@ export async function criarMovimentacao(req, res) {
 
   // Se vier null, a categoria nao pertence ao usuario ou nao existe.
   if (!movimentacao) {
-    return res.status(400).json({ message: 'Categoria invalida para este usuario.' });
+    return res.status(400).json({ message: 'Categoria inválida para este usuário.' });
   }
 
   // Retorna a movimentacao criada.
@@ -60,7 +60,7 @@ export async function editarMovimentacao(req, res) {
   // Mantem a mesma regra de campos obrigatorios usada na criacao.
   if (!validarDadosMovimentacao({ categoria_id, descricao, valor, tipo, data_movimentacao })) {
     return res.status(400).json({
-      message: 'Informe categoria, descricao, valor positivo, tipo valido e data correta.',
+      message: 'Informe categoria, descrição, valor positivo, tipo válido e data correta.',
     });
   }
 
@@ -77,7 +77,7 @@ export async function editarMovimentacao(req, res) {
 
   // Quando nada e atualizado, o registro nao existe ou pertence a outro usuario.
   if (!movimentacao) {
-    return res.status(404).json({ message: 'Movimentacao nao encontrada ou categoria invalida.' });
+    return res.status(404).json({ message: 'Movimentação não encontrada ou categoria inválida.' });
   }
 
   return res.json(movimentacao);
@@ -91,7 +91,7 @@ export async function excluirMovimentacao(req, res) {
   const removida = await Movimentacao.delete({ id, usuarioId: req.usuario.id });
 
   if (!removida) {
-    return res.status(404).json({ message: 'Movimentacao nao encontrada.' });
+    return res.status(404).json({ message: 'Movimentação não encontrada.' });
   }
 
   // Status 204 significa sucesso sem corpo de resposta.

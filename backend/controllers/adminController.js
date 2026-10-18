@@ -16,15 +16,15 @@ export async function atualizarUsuario(req, res) {
   const { perfil, ativo } = req.body || {};
 
   if (!Number.isInteger(id)) {
-    return res.status(400).json({ message: 'Id invalido.' });
+    return res.status(400).json({ message: 'Id inválido.' });
   }
 
   if (perfil !== undefined && !['usuario', 'admin'].includes(perfil)) {
-    return res.status(400).json({ message: 'Perfil invalido.' });
+    return res.status(400).json({ message: 'Perfil inválido.' });
   }
 
   if (id === req.usuario.id && (perfil === 'usuario' || ativo === false)) {
-    return res.status(400).json({ message: 'Voce nao pode remover seu proprio acesso de admin.' });
+    return res.status(400).json({ message: 'Você não pode remover seu próprio acesso de admin.' });
   }
 
   const atualizado = await Admin.atualizarUsuario({
@@ -34,10 +34,10 @@ export async function atualizarUsuario(req, res) {
   });
 
   if (!atualizado) {
-    return res.status(404).json({ message: 'Usuario nao encontrado.' });
+    return res.status(404).json({ message: 'Usuário não encontrado.' });
   }
 
-  return res.json({ message: 'Usuario atualizado.' });
+  return res.json({ message: 'Usuário atualizado.' });
 }
 
 // Exclui um usuario e todos os dados ligados a ele.
@@ -45,15 +45,15 @@ export async function excluirUsuario(req, res) {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id)) {
-    return res.status(400).json({ message: 'Id invalido.' });
+    return res.status(400).json({ message: 'Id inválido.' });
   }
 
   if (id === req.usuario.id) {
-    return res.status(400).json({ message: 'Voce nao pode excluir a propria conta.' });
+    return res.status(400).json({ message: 'Você não pode excluir a própria conta.' });
   }
 
   if (!(await Admin.excluirUsuario(id))) {
-    return res.status(404).json({ message: 'Usuario nao encontrado.' });
+    return res.status(404).json({ message: 'Usuário não encontrado.' });
   }
 
   return res.status(204).send();

@@ -3,7 +3,7 @@ import { rateLimit } from 'express-rate-limit';
 import { cadastro, login } from '../controllers/authController.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 
-// Cria um roteador separado para organizar as rotas de autenticacao.
+// Cria um roteador separado para organizar as rotas de autenticação.
 const router = Router();
 const createAuthLimiter = (limit, message) => rateLimit({
 	windowMs: 15 * 60 * 1000,
@@ -16,7 +16,7 @@ const createAuthLimiter = (limit, message) => rateLimit({
 // POST /auth/cadastro cria conta e devolve token.
 router.post(
 	'/cadastro',
-	createAuthLimiter(5, 'Muitas tentativas de cadastro. Tente novamente mais tarde.'),
+	createAuthLimiter(10, 'Muitas tentativas de cadastro. Tente novamente mais tarde.'),
 	asyncHandler(cadastro),
 );
 

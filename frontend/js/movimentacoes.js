@@ -32,7 +32,7 @@ function renderMovimentacoes(movimentacoes) {
 
   // Se nao houver dados, mostra uma mensagem simples.
   if (!movimentacoes.length) {
-    movimentacoesLista.innerHTML = '<p class="empty">Nenhuma movimentacao cadastrada.</p>';
+    movimentacoesLista.innerHTML = '<p class="empty">Nenhuma movimentação cadastrada.</p>';
     return;
   }
 
@@ -103,7 +103,7 @@ movimentacaoForm.addEventListener('submit', async (event) => {
     }
 
     resetForm();
-    window.AppUtils.showMessage('Movimentacao salva com sucesso.');
+    window.AppUtils.showMessage('Movimentação salva com sucesso.');
     carregarDados();
   } catch (error) {
     window.AppUtils.showMessage(window.AppUtils.getApiError(error), 'error');
@@ -139,7 +139,7 @@ movimentacoesLista.addEventListener('click', async (event) => {
   if (excluirButton) {
     try {
       await window.ApiService.excluirMovimentacao(excluirButton.dataset.excluir);
-      window.AppUtils.showMessage('Movimentacao excluida com sucesso.');
+      window.AppUtils.showMessage('Movimentação excluída com sucesso.');
       carregarDados();
     } catch (error) {
       window.AppUtils.showMessage(window.AppUtils.getApiError(error), 'error');

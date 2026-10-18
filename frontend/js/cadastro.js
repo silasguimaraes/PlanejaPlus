@@ -5,7 +5,7 @@ const registrationDisabledMessage = document.querySelector('#registration-disabl
 if (!window.PUBLIC_REGISTRATION_ENABLED) {
   cadastroForm.hidden = true;
   registrationDisabledMessage.hidden = false;
-  registrationDisabledMessage.textContent = 'O cadastro publico esta desativado.';
+  registrationDisabledMessage.textContent = 'O cadastro público está desativado.';
 } else {
   cadastroForm.addEventListener('submit', async (event) => {
     event.preventDefault();

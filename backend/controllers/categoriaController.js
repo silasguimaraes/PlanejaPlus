@@ -7,7 +7,7 @@ export async function criarCategoria(req, res) {
 
   // Garante que a categoria tenha as informacoes minimas para existir.
   if (!nome || !tipo) {
-    return res.status(400).json({ message: 'Nome e tipo sao obrigatorios.' });
+    return res.status(400).json({ message: 'Nome e tipo são obrigatórios.' });
   }
 
   // Usa req.usuario.id para ligar a categoria ao usuario dono do token.

@@ -9,7 +9,7 @@ function createToken(usuario) {
     {
       id: usuario.id,
       email: usuario.email,
-      perfil: usuario.perfil || 'usuario',
+      perfil: usuario.perfil || 'usuário',
       ativo: usuario.ativo ?? true,
     },
     env.jwtSecret,
@@ -20,7 +20,7 @@ function createToken(usuario) {
 // Controller responsavel por criar uma nova conta de usuario.
 export async function cadastro(req, res) {
   if (!env.allowPublicRegistration) {
-    return res.status(403).json({ message: 'Cadastro publico desativado.' });
+    return res.status(403).json({ message: 'Cadastro público desativado.' });
   }
 
   // Extrai os campos enviados pelo frontend no corpo da requisicao.
@@ -28,14 +28,14 @@ export async function cadastro(req, res) {
 
   // Valida os campos obrigatorios antes de tentar salvar no banco.
   if (!nome || !email || !senha) {
-    return res.status(400).json({ message: 'Nome, email e senha sao obrigatorios.' });
+    return res.status(400).json({ message: 'Nome, email e senha são obrigatórios.' });
   }
 
 //VALIDAÇÂO BACKEND
 
 
   if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-    return res.status(400).json({ message: 'Informe um email valido com @ e dominio.' });
+    return res.status(400).json({ message: 'Informe um email válido com @ e domínio.' });
   }
 
   if (typeof senha !== 'string' || [...senha].length < 8) {
@@ -74,21 +74,21 @@ export async function login(req, res) {
 
   // Sem esses dados, nao e possivel conferir as credenciais.
   if (!email || !senha) {
-    return res.status(400).json({ message: 'Email e senha sao obrigatorios.' });
+    return res.status(400).json({ message: 'Email e senha são obrigatórios.' });
   }
 
   // Busca o usuario pelo email informado.
   const usuario = await Usuario.findByEmail(email);
 
   if (!usuario) {
-    return res.status(401).json({ message: 'Credenciais invalidas.' });
+    return res.status(401).json({ message: 'Credenciais inválidas.' });
   }
 
   // Compara a senha digitada com a senha criptografada salva no banco.
   const senhaValida = await bcrypt.compare(senha, usuario.senha);
 
   if (!senhaValida) {
-    return res.status(401).json({ message: 'Credenciais invalidas.' });
+    return res.status(401).json({ message: 'Credenciais inválidas.' });
   }
 
   // Gera um token para o frontend guardar e usar nas rotas protegidas.

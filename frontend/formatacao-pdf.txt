@@ -1,0 +1,158 @@
+Referencia: funcao de exportacao e formatacao do PDF antes de voltar ao formato simples.
+Arquivo de origem: js/relatorios.js
+
+function exportarRelatorioPdf() {
+  const { jsPDF } = window.jspdf;
+  const relatorio = obterDadosRelatorio();
+  const documento = new jsPDF();
+  const larguraPagina = documento.internal.pageSize.getWidth();
+  const alturaPagina = documento.internal.pageSize.getHeight();
+  const margem = 18;
+  const larguraConteudo = larguraPagina - margem * 2;
+  
+  // Cabecalho do documento.
+  documento.setFillColor(31, 41, 55);
+  documento.rect(0, 0, larguraPagina, 48, 'F');
+  documento.setFillColor(37, 99, 235);
+  documento.rect(0, 0, larguraPagina, 3, 'F');
+  documento.setTextColor(255, 255, 255);
+  documento.setFont('helvetica', 'bold');
+  documento.setFontSize(10);
+  documento.text('PLANEJA+', margem, 15);
+  documento.setFontSize(20);
+  documento.text('Relatório financeiro', margem, 29);
+  documento.setFont('helvetica', 'normal');
+  documento.setFontSize(10);
+  documento.setTextColor(220, 228, 240);
+  documento.text('Resumo das movimentações por período e categoria', margem, 39);
+
+  // Periodo selecionado pelo usuario.
+  documento.setTextColor(107, 114, 128);
+  documento.setFont('helvetica', 'normal');
+  documento.setFontSize(9);
+  documento.text('PERÍODO', margem, 61);
+  documento.setTextColor(31, 41, 55);
+  documento.setFont('helvetica', 'bold');
+  documento.setFontSize(11);
+  documento.text(relatorio.periodo, margem, 68);
+
+  documento.setFont('helvetica', 'normal');
+  documento.setFontSize(9);
+  documento.setTextColor(107, 114, 128);
+  documento.text(`Gerado em ${new Date().toLocaleDateString('pt-BR')}`, larguraPagina - margem, 68, {
+    align: 'right',
+  });
+
+  // Cards de resumo financeiro.
+  documento.setTextColor(31, 41, 55);
+  documento.setFont('helvetica', 'bold');
+  documento.setFontSize(13);
+  documento.text('Resumo financeiro', margem, 84);
+
+  const espacoCards = 5;
+  const larguraCard = (larguraConteudo - espacoCards * 2) / 3;
+  const cards = [
+    { titulo: 'Receitas', valor: relatorio.receitas, cor: [21, 128, 61] },
+    { titulo: 'Despesas', valor: relatorio.despesas, cor: [220, 38, 38] },
+    { titulo: 'Saldo do período', valor: relatorio.saldo, cor: [37, 99, 235] },
+  ];
+
+  cards.forEach((card, indice) => {
+    const x = margem + indice * (larguraCard + espacoCards);
+    documento.setFillColor(246, 247, 249);
+    documento.setDrawColor(216, 222, 232);
+    documento.roundedRect(x, 90, larguraCard, 29, 2, 2, 'FD');
+    documento.setTextColor(107, 114, 128);
+    documento.setFont('helvetica', 'normal');
+    documento.setFontSize(9);
+    documento.text(card.titulo, x + 5, 99);
+    documento.setTextColor(...card.cor);
+    documento.setFont('helvetica', 'bold');
+    documento.setFontSize(12);
+    documento.text(card.valor, x + 5, 111);
+  });
+
+  // Tabela agrupada por categoria e tipo.
+  documento.setTextColor(31, 41, 55);
+  documento.setFont('helvetica', 'bold');
+  documento.setFontSize(13);
+  documento.text('Detalhamento por categoria', margem, 137);
+
+  const largurasColunas = [70, 36, 24, 44];
+  const titulosColunas = ['Categoria', 'Tipo', 'Quantidade', 'Total'];
+  let y = 143;
+
+  function desenharCabecalhoTabela() {
+    documento.setFillColor(37, 99, 235);
+    documento.roundedRect(margem, y, larguraConteudo, 10, 1.5, 1.5, 'F');
+    documento.setTextColor(255, 255, 255);
+    documento.setFont('helvetica', 'bold');
+    documento.setFontSize(8);
+
+    let x = margem + 4;
+    titulosColunas.forEach((titulo, indice) => {
+      documento.text(titulo, x, y + 6.5);
+      x += largurasColunas[indice];
+    });
+
+    y += 10;
+  }
+
+  desenharCabecalhoTabela();
+
+  if (!relatorio.detalhes.length) {
+    documento.setTextColor(107, 114, 128);
+    documento.setFont('helvetica', 'normal');
+    documento.setFontSize(10);
+    documento.text('Nenhuma movimentação encontrada neste período.', margem + 4, y + 9);
+    y += 16;
+  } else {
+    relatorio.detalhes.forEach((item, indice) => {
+      const categoria = documento.splitTextToSize(item.categoria || 'Sem categoria', largurasColunas[0] - 8);
+      const tipo = item.tipo === 'receita' ? 'Receita' : 'Despesa';
+      const alturaLinha = Math.max(10, categoria.length * 4.5 + 5);
+
+      if (y + alturaLinha > alturaPagina - 20) {
+        documento.addPage();
+        y = 20;
+        desenharCabecalhoTabela();
+      }
+
+      if (indice % 2 === 0) {
+        documento.setFillColor(246, 247, 249);
+        documento.rect(margem, y, larguraConteudo, alturaLinha, 'F');
+      }
+
+      documento.setTextColor(31, 41, 55);
+      documento.setFont('helvetica', 'normal');
+      documento.setFontSize(9);
+      documento.text(categoria, margem + 4, y + 6.5);
+      documento.text(tipo, margem + largurasColunas[0] + 4, y + 6.5);
+      documento.text(String(item.quantidade), margem + largurasColunas[0] + largurasColunas[1] + largurasColunas[2] - 4, y + 6.5, {
+        align: 'right',
+      });
+      documento.setFont('helvetica', 'bold');
+      documento.text(window.AppUtils.formatCurrency(item.total), margem + larguraConteudo - 4, y + 6.5, {
+        align: 'right',
+      });
+      y += alturaLinha;
+    });
+  }
+
+  // Rodape numerado em todas as paginas.
+  const totalPaginas = documento.internal.getNumberOfPages();
+  for (let pagina = 1; pagina <= totalPaginas; pagina += 1) {
+    documento.setPage(pagina);
+    documento.setDrawColor(216, 222, 232);
+    documento.line(margem, alturaPagina - 15, larguraPagina - margem, alturaPagina - 15);
+    documento.setTextColor(107, 114, 128);
+    documento.setFont('helvetica', 'normal');
+    documento.setFontSize(8);
+    documento.text('Planeja+ · Relatório financeiro', margem, alturaPagina - 9);
+    documento.text(`${pagina} / ${totalPaginas}`, larguraPagina - margem, alturaPagina - 9, {
+      align: 'right',
+    });
+  }
+
+  documento.save('relatorio-planeja-plus.pdf');
+}

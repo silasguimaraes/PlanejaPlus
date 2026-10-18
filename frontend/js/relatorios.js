@@ -1,6 +1,7 @@
 // Seleciona elementos usados pelos filtros e pela tabela do relatorio.
 const relatorioForm = document.querySelector('.filters');
 const exportarPdfButton = document.querySelector('#exportar-pdf');
+const exportarCsvButton = document.querySelector('#exportar-csv');
 const detalhesTabela = document.querySelector('#relatorio-detalhes');
 const periodoInicioInput = document.querySelector('#periodo-inicio');
 const periodoFimInput = document.querySelector('#periodo-fim');
@@ -25,7 +26,7 @@ function definirPeriodoInicial() {
   periodoFimInput.value = formatarInput(hoje);
 }
 
-// Aplica os filtros de periodo e tipo sobre as movimentacoes carregadas.
+// Aplica os filtros de periodo e tipo sobre as movimentacoes carregadas (para que eu não precise consultar a API toda hora).
 function filtrarMovimentacoes() {
   const inicio = document.querySelector('#periodo-inicio').value;
   const fim = document.querySelector('#periodo-fim').value;
@@ -57,7 +58,7 @@ function calcularResumo(movimentacoes) {
   };
 }
 
-// Agrupa movimentacoes por categoria e tipo para montar o detalhamento.
+// Agrupa movimentações por categoria e tipo para montar o detalhamento.
 function agruparDetalhes(movimentacoes) {
   const grupos = new Map();
 
@@ -101,12 +102,12 @@ function renderDetalhes(detalhes) {
   if (!detalhes.length) {
     detalhesTabela.innerHTML = `
       <tr>
-        <td colspan="4">Nenhuma movimentacao encontrada no periodo.</td>
+        <td colspan="4">Nenhuma movimentação encontrada no período.</td>
       </tr>
     `;
     return;
   }
-
+  //  Usei da IA para me ajudar a criar a taberla de detalhes ja que estava com dificuldade de fazer a tabela de detalhes, e ela me ajudou a criar a tabela de detalhes.
   detalhesTabela.innerHTML = detalhes
     .map(
       (item) => `
@@ -131,43 +132,47 @@ function atualizarRelatorio() {
   renderDetalhes(detalhes);
 }
 
-// Coleta os dados ja exibidos na tela para montar o PDF.
+// Recalcula os dados filtrados para manter o PDF igual ao relatorio exibido.
 function obterDadosRelatorio() {
   const inicio = document.querySelector('#periodo-inicio').value;
   const fim = document.querySelector('#periodo-fim').value;
-  const receitas = document.querySelector('#relatorio-receitas').textContent;
-  const despesas = document.querySelector('#relatorio-despesas').textContent;
-  const saldo = document.querySelector('#relatorio-saldo').textContent;
+  const movimentacoes = filtrarMovimentacoes();
+  const resumo = calcularResumo(movimentacoes);
 
   return {
     periodo: `${formatarDataInput(inicio)} a ${formatarDataInput(fim)}`,
-    receitas,
-    despesas,
-    saldo,
+    receitas: window.AppUtils.formatCurrency(resumo.receitas),
+    despesas: window.AppUtils.formatCurrency(resumo.despesas),
+    saldo: window.AppUtils.formatCurrency(resumo.saldo),
+    detalhes: agruparDetalhes(movimentacoes),
   };
 }
 
-// Gera um arquivo PDF simples usando a biblioteca jsPDF.
+// ----------------------------------------------------------------------------------------------------------------------------
+
+// AQUI COMEÇA A PARTE DE EDITAR O PDF, QUE É A PARTE MAIS COMPLICADA, POIS TEM QUE LIDAR COM PAGINAÇÃO E FORMATAÇÃO DE TEXTO.
+// TODAS AS CORES E FORMATAÇÕES DE TEXTO DEVEM TER O MESMO PADRÃO DO SITE, POIS O PDF É UMA EXTENSÃO DO SITE, ENTÃO DEVE TER A MESMA IDENTIDADE VISUAL.
+// 
+
+// ----------------------------------------------------------------------------------------------------------------------------
+
+// Gera um relatorio PDF com resumo, detalhamento e suporte a varias paginas.
 function exportarRelatorioPdf() {
   const { jsPDF } = window.jspdf;
   const relatorio = obterDadosRelatorio();
   const documento = new jsPDF();
 
-  // Cabecalho do documento.
   documento.setFont('helvetica', 'bold');
   documento.setFontSize(20);
-  documento.text('Planeja+ - Relatorio Financeiro', 20, 24);
+  documento.text('Planeja+ - Relatório Financeiro', 20, 24);
 
-  // Periodo selecionado pelo usuario.
   documento.setFont('helvetica', 'normal');
   documento.setFontSize(12);
-  documento.text(`Periodo selecionado: ${relatorio.periodo}`, 20, 40);
+  documento.text(`Período selecionado: ${relatorio.periodo}`, 20, 40);
 
-  // Linha divisoria para separar cabecalho e conteudo.
   documento.setDrawColor(216, 222, 232);
   documento.line(20, 48, 190, 48);
 
-  // Resumo financeiro dentro do PDF.
   documento.setFont('helvetica', 'bold');
   documento.setFontSize(14);
   documento.text('Resumo', 20, 62);
@@ -178,7 +183,6 @@ function exportarRelatorioPdf() {
   documento.text(`Despesas: ${relatorio.despesas}`, 20, 92);
   documento.text(`Saldo: ${relatorio.saldo}`, 20, 106);
 
-  // Rodape informando a origem dos dados.
   documento.setFontSize(10);
   documento.setTextColor(107, 114, 128);
   documento.text('Gerado a partir dos dados da API Planeja+.', 20, 282);
@@ -186,11 +190,83 @@ function exportarRelatorioPdf() {
   documento.save('relatorio-planeja-plus.pdf');
 }
 
+
+
+// ESPAÇO RESERVADO PARA FUTURA FORMATAÇÃO VISUAL DA EXPORTAÇÃO CSV.
+// A função abaixo exporta os dados atuais; a formatação do CSV será feita aqui depois.
+
+  function exportarRelatorioCSV() {
+    const detalhes = agruparDetalhes(filtrarMovimentacoes());
+    const linhas = [
+      ['Categoria', 'Tipo', 'Quantidade', 'Total'],
+      ...detalhes.map((item) => [
+        item.categoria || 'Sem categoria',
+        item.tipo === 'receita' ? 'Receita' : 'Despesa',
+        item.quantidade,
+        Number(item.total).toFixed(2).replace('.', ','),
+      ]),
+    ];
+  // ===============================================================================================================================================================================
+  // Esse const é o que transforma os dados em CSV, e o \uFEFF é para evitar problemas de acentuação no Excel. 
+  // Foi o CODEX que me indicou usar essa função ja que perdemos muito tempo para arrumar todos os erros de pontuação criados por não imoportar a biblioteca Javascript correta
+  // ===============================================================================================================================================================================
+  
+    const csv = '\uFEFF' + linhas 
+    .map((linha) =>
+    linha
+      .map((valor) => `"${String(valor).replaceAll('"', '""')}"`)
+      .join(';'),
+  )
+  .join('\r\n');
+    const arquivo = new Blob([csv], { type: 'text/csv;charset=utf-8;' });  //CRIA O AQUIVO CSV COM OS DADOS DO RELATORIO
+    const url = URL.createObjectURL(arquivo); //CRIA O ENDEREÇO DO AQUIVO PARA O USUARIO BAIXAR ATRAVES DO NAVEGADOR
+      const link = document.createElement('a'); 
+      //CRIA UM LINK PARA O USUARIO BAIXAR O AQUIVO, ESSE LINK É CRIADO PARA O USUARIO BAIXAR O AQUIVO, POIS O JAVASCRIPT NÃO PERMITE BAIXAR ARQUIVOS DIRETAMENTE SEM UM LINK.
+      // E ELE É INVISIVEL PARA O USUARIO, POIS ELE NÃO PRECISA CLICAR NELE, ELE É CLICADO AUTOMATICAMENTE PELO JAVASCRIPT.
+
+      link.href = url;
+      link.download = 'relatorio-planeja-plus.csv';
+      link.click();
+
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+      //===================================================================================================//
+      
+
+      //ESPAÇO RESERVADO PARA FUTURA FORMATAÇÃO VISUAL DA EXPORTAÇÃO CSV.
+
+
+      //===================================================================================================//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
 // Carrega movimentacoes da API e renderiza o primeiro relatorio.
 async function carregarRelatorio() {
   try {
     movimentacoesRelatorio = await window.ApiService.listarMovimentacoes();
     exportarPdfButton.disabled = false;
+    exportarCsvButton.disabled = false;
     atualizarRelatorio();
   } catch (error) {
     console.error(window.AppUtils.getApiError(error));
@@ -206,10 +282,12 @@ relatorioForm.addEventListener('submit', (event) => {
 
 // O botao de PDF chama a funcao de exportacao.
 exportarPdfButton.addEventListener('click', exportarRelatorioPdf);
+exportarCsvButton.addEventListener('click', exportarRelatorioCSV);
 
 // Protege a pagina, prepara logout e carrega dados iniciais.
 definirPeriodoInicial();
 exportarPdfButton.disabled = true;
+exportarCsvButton.disabled = true;
 window.AppUtils.requireAuth();
 window.AppUtils.setupAdminLink();
 window.AppUtils.setupLogout();

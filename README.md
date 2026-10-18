@@ -1,5 +1,17 @@
 # Planeja+
 
+PASSO A PASSO PLANEJA MAIS
+
+
+1- ABRA O TERMINAL NO VSCODE
+
+2-DIGITE cd planejamais TECLE TAB
+
+3-DIGITE cd backend TECLE TAB
+
+4-DIGITE npm run dev
+
+5-RODAR O PROJETO NO INDEX.HTML 
 
 
 - Frontend: HTML, CSS e JavaScript
@@ -139,7 +151,7 @@ Acesse:
 ```text
 http://localhost:5500
 ```
-
+<!-- O JWT SECRET PUXA INFORMAÇÕES SEM EXPOR O PROVEDOR -->
 ## Publicar a API
 
 - Configure no servico do backend `NODE_ENV=production`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` e `DB_NAME` com as credenciais do MySQL privado do provedor. Nao exponha a porta do banco publicamente.
@@ -204,3 +216,4 @@ Authorization: Bearer seu_token_jwt
 - O dashboard usa Chart.js com dados vindos da API.
 - A exportacao PDF usa jsPDF na tela de relatorios.
 - Arquivos `.env` e `node_modules` nao devem ser enviados ao Git.
+- Lembrar sempre que deve-se mudar a .env sempre que mudar a maquina e adicionar sua própia porta do banco de dados e senha

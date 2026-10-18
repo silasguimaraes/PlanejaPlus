@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Relatorios | Planeja+</title>
+    <title>Relatórios | Planeja+</title>
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body>
@@ -24,8 +24,8 @@
     <main class="container">
       <!-- Titulo e descricao da pagina de relatorios. -->
       <section class="page-heading">
-        <p class="eyebrow">Analise</p>
-        <h1>Relatorios</h1>
+        <p class="eyebrow">Análise</p>
+        <h1>Relatórios</h1>
         <p class="muted">Filtre as movimentações por período e exporte o resumo em PDF.</p>
       </section>
 
@@ -51,8 +51,10 @@
             </select>
           </label>
 
-          <button class="button primary" type="submit">Gerar relatorio</button>
+          <button class="button primary" type="submit">Gerar relatório</button>
           <button id="exportar-pdf" class="button secondary" type="button">Exportar PDF</button>
+          <button id="exportar-csv" class="button secondary" type="button">Exportar CSV</button>
+          
         </form>
       </section>
 
@@ -94,6 +96,7 @@
       </section>
     </main>
     <!-- Bibliotecas externas e scripts locais usados no relatorio. -->
+    <!-- Foi utilizada a biblioteca jsPDF para geração do documento PDF. -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="./js/api-config.js"></script>
