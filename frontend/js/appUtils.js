@@ -35,8 +35,30 @@ function requireAuth() {
   const token = localStorage.getItem('planeja_token');
 
   if (!token) {
-    window.location.href = './login.html';
+    alertLoginRequired();
+    window.location.replace('./login.html');
+    return false;
   }
+
+  return true;
+}
+
+function alertLoginRequired() {
+  window.alert('Você precisa estar logado para acessar esta página.');
+}
+
+function setupAuthNavigation() {
+  document.querySelectorAll('[data-auth-required]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (localStorage.getItem('planeja_token')) {
+        return;
+      }
+
+      event.preventDefault();
+      alertLoginRequired();
+      window.location.href = './login.html';
+    });
+  });
 }
 
 function getCurrentUser() {
@@ -121,8 +143,11 @@ window.AppUtils = {
   getCurrentUser,
   requireAuth,
   setCurrentUser,
+  setupAuthNavigation,
   setupAdminLink,
   setupLogout,
   showMessage,
   toInputDate,
 };
+
+setupAuthNavigation();

@@ -1,0 +1,110 @@
+Referencia: funcao de exportacao e formatacao visual do Excel.
+Arquivo de origem: js/relatorios.js
+
+// ===============================================================================================================================================================================
+// CSV PERMITE ALTERAR COLUNAS, SEPARADORES E VALORES, MAS NAO GUARDA CORES OU FORMATACAO VISUAL.
+// POR ISSO ESTA VERSAO USA XLSX, QUE PERMITE FORMATAR A PLANILHA E ABRIR OS DADOS EM COLUNAS NO EXCEL.
+// ===============================================================================================================================================================================
+
+async function exportarRelatorioExcel() {
+  exportarExcelButton.disabled = true;
+
+  try { // OBTEM OS DADOS DO RELATORIO PARA MONTAR A PLANILHA.
+    const relatorio = obterDadosRelatorio();
+    const workbook = new window.ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Relatório');
+
+    // DEFINE AS COLUNAS DA PLANILHA E A LARGURA PARA CADA UMA.
+    worksheet.columns = [
+      { header: 'Categoria', key: 'categoria', width: 32 },
+      { header: 'Tipo', key: 'tipo', width: 16 },
+      { header: 'Quantidade', key: 'quantidade', width: 16 },
+      { header: 'Total', key: 'total', width: 20 },
+    ];
+
+    // TITULO PRINCIPAL COM FUNDO ESCURO E TEXTO BRANCO.
+    worksheet.mergeCells('A1:D1');
+    worksheet.getCell('A1').value = 'Planeja+ | Relatório financeiro';
+    worksheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } };
+    worksheet.getCell('A1').fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF1F2937' },
+    };
+    worksheet.getRow(1).height = 30;
+
+    // MOSTRA O PERIODO SELECIONADO ANTES DOS DADOS DO RELATORIO.
+    worksheet.mergeCells('A2:D2');
+    worksheet.getCell('A2').value = `Período: ${relatorio.periodo}`;
+    worksheet.getCell('A2').font = { italic: true, color: { argb: 'FF6B7280' } };
+    worksheet.addRow([]);
+
+    // CABECALHO AZUL PARA DIFERENCIAR OS NOMES DAS COLUNAS DOS DADOS.
+    const headerRow = worksheet.addRow(['Categoria', 'Tipo', 'Quantidade', 'Total']);
+    headerRow.height = 24;
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF2563EB' },
+      };
+      cell.alignment = { vertical: 'middle' };
+    });
+
+    // ADICIONA OS TOTAIS AGRUPADOS E DESTACA LINHAS ALTERNADAS PARA FACILITAR A LEITURA.
+    relatorio.detalhes.forEach((item, indice) => {
+      const row = worksheet.addRow({
+        categoria: item.categoria || 'Sem categoria',
+        tipo: item.tipo === 'receita' ? 'Receita' : 'Despesa',
+        quantidade: item.quantidade,
+        total: Number(item.total),
+      });
+
+      if (indice % 2 === 1) {
+        row.eachCell((cell) => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFF6F7F9' },
+          };
+        });
+      }
+
+      row.getCell(3).alignment = { horizontal: 'center' };
+      // MANTEM O TOTAL COMO NUMERO PARA PERMITIR CALCULOS NO EXCEL.
+      row.getCell(4).numFmt = '"R$" #,##0.00';
+    });
+
+    // INFORMA QUANDO O FILTRO NAO ENCONTRAR MOVIMENTACOES.
+    if (!relatorio.detalhes.length) {
+      const emptyRow = worksheet.addRow(['Nenhuma movimentação encontrada neste período.']);
+      worksheet.mergeCells(`A${emptyRow.number}:D${emptyRow.number}`);
+      emptyRow.getCell(1).font = { italic: true, color: { argb: 'FF6B7280' } };
+    }
+
+    // ATIVA FILTRO NAS COLUNAS E MANTEM O TITULO E CABECALHO VISIVEIS AO ROLAR.
+    worksheet.autoFilter = {
+      from: 'A4',
+      to: `D${4 + relatorio.detalhes.length}`,
+    };
+    worksheet.views = [{ state: 'frozen', ySplit: 4 }];
+
+    // GERA O ARQUIVO XLSX E INICIA O DOWNLOAD NO NAVEGADOR.
+    const conteudo = await workbook.xlsx.writeBuffer();
+    const arquivo = new Blob([conteudo], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    const url = URL.createObjectURL(arquivo);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'relatorio-planeja-plus.xlsx';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    console.error('Não foi possível exportar o relatório Excel.', error);
+    window.AppUtils.showMessage('Não foi possível exportar o relatório Excel.', 'error');
+  } finally {
+    exportarExcelButton.disabled = false;
+  }
+}

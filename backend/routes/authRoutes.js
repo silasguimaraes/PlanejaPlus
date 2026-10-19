@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
-import { cadastro, login } from '../controllers/authController.js';
+import {
+	cadastro,
+	esqueciSenha,
+	login,
+	redefinirSenha,
+	validarTokenRedefinicao,
+} from '../controllers/authController.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 
 // Cria um roteador separado para organizar as rotas de autenticação.
@@ -25,6 +31,24 @@ router.post(
 	'/login',
 	createAuthLimiter(10, 'Muitas tentativas de login. Tente novamente mais tarde.'),
 	asyncHandler(login),
+);
+
+router.post(
+	'/esqueci-senha',
+	createAuthLimiter(5, 'Muitas solicitações de recuperação de senha. Tente novamente mais tarde.'),
+	asyncHandler(esqueciSenha),
+);
+
+router.get(
+	'/redefinir-senha/:token',
+	createAuthLimiter(30, 'Muitas tentativas. Tente novamente mais tarde.'),
+	asyncHandler(validarTokenRedefinicao),
+);
+
+router.post(
+	'/redefinir-senha',
+	createAuthLimiter(10, 'Muitas tentativas de redefinição de senha. Tente novamente mais tarde.'),
+	asyncHandler(redefinirSenha),
 );
 
 export default router;

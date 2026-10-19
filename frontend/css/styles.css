@@ -166,6 +166,10 @@ p {
   margin-top: 24px;
 }
 
+.form[hidden] {
+  display: none;
+}
+
 /* Linha de formulario com dois campos lado a lado. */
 .form-row {
   display: grid;
@@ -491,6 +495,27 @@ th {
   color: var(--muted);
   font-size: 0.9rem;
   text-transform: uppercase;
+}
+
+.faq-list {
+  display: grid;
+  gap: 12px;
+}
+
+.faq-item {
+  padding: 20px;
+}
+
+.faq-item summary {
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.faq-item p {
+  margin: 14px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 /* Regras aplicadas em telas pequenas, como celulares. */

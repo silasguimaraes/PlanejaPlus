@@ -75,3 +75,17 @@ CREATE TABLE IF NOT EXISTS relatorios (
     ON UPDATE CASCADE
 );
 
+-- Guarda apenas hashes dos tokens de redefinicao de senha, nunca o token original.
+CREATE TABLE IF NOT EXISTS redefinicoes_senha (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT NOT NULL,
+  token_hash CHAR(64) NOT NULL UNIQUE,
+  expira_em DATETIME NOT NULL,
+  usado_em DATETIME NULL,
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_redefinicoes_usuario (usuario_id),
+  CONSTRAINT fk_redefinicoes_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);

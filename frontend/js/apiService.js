@@ -33,6 +33,21 @@ const ApiService = {
     return response.data;
   },
 
+  async esqueciSenha(dados) {
+    const response = await api.post('/auth/esqueci-senha', dados);
+    return response.data;
+  },
+
+  async validarTokenRedefinicao(token) {
+    const response = await api.get(`/auth/redefinir-senha/${encodeURIComponent(token)}`);
+    return response.data;
+  },
+
+  async redefinirSenha(dados) {
+    const response = await api.post('/auth/redefinir-senha', dados);
+    return response.data;
+  },
+
   // Busca os totais gerais do painel administrativo.
   async adminResumo() {
     const response = await api.get('/admin/resumo');

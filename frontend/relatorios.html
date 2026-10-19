@@ -15,6 +15,7 @@
         <a href="./movimentacoes.html">Movimentações</a>
         <a href="./categorias.html">Categorias</a>
         <a href="./relatorios.html">Relatórios</a>
+        <a href="./faq.html">FAQ</a>
         <a href="./admin.html" data-admin-link>Admin</a>
         <a href="./login.html" data-logout>Sair</a>
       </nav>
@@ -26,7 +27,7 @@
       <section class="page-heading">
         <p class="eyebrow">Análise</p>
         <h1>Relatórios</h1>
-        <p class="muted">Filtre as movimentações por período e exporte o resumo em PDF.</p>
+        <p class="muted">Filtre as movimentações por período e exporte o resumo em PDF ou Excel.</p>
       </section>
 
       <!-- Formulario de filtros usado pelo relatorios.js. -->
@@ -53,7 +54,7 @@
 
           <button class="button primary" type="submit">Gerar relatório</button>
           <button id="exportar-pdf" class="button secondary" type="button">Exportar PDF</button>
-          <button id="exportar-csv" class="button secondary" type="button">Exportar CSV</button>
+          <button id="exportar-excel" class="button secondary" type="button">Exportar Excel</button>
           
         </form>
       </section>
@@ -99,6 +100,7 @@
     <!-- Foi utilizada a biblioteca jsPDF para geração do documento PDF. -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <script src="./js/api-config.js"></script>
     <script src="./js/apiService.js"></script>
     <script src="./js/appUtils.js"></script>

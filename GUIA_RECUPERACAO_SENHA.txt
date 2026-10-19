@@ -1,0 +1,112 @@
+GUIA DE RECUPERACAO DE SENHA - PLANEJA+
+
+O QUE FOI ADICIONADO
+
+1. Na tela de login existe o link "Esqueci minha senha".
+2. O usuario informa o email e recebe um link para criar outra senha.
+3. O link expira depois de 60 minutos por padrao e so pode ser usado uma vez.
+4. A senha nova deve ter pelo menos 8 caracteres e conter um simbolo ou pontuacao.
+5. Depois de trocar a senha, o usuario volta para a tela de login.
+
+
+TESTAR NO COMPUTADOR (SEM CONFIGURAR EMAIL)
+
+O modo local mostra o link no terminal do backend. Para esse link abrir corretamente,
+rode o frontend por HTTP; nao abra somente o arquivo index.html diretamente.
+
+TERMINAL 1 - API
+
+1. Abra um terminal no VS Code na pasta principal do projeto.
+2. Entre na pasta do backend:
+
+   cd .\PlanejaMais-main\PlanejaMais-main\backend
+
+3. Inicie a API:
+
+   npm run dev
+
+4. Deixe esse terminal aberto. Ele mostrara o link de recuperacao quando solicitado.
+
+TERMINAL 2 - SITE
+
+1. Abra um segundo terminal no VS Code, tambem na pasta principal do projeto.
+2. Entre na pasta do frontend:
+
+   cd .\PlanejaMais-main\PlanejaMais-main\frontend
+
+3. Inicie um servidor local:
+
+   python -m http.server 5500
+
+4. No navegador, abra:
+
+   http://localhost:5500/login.html
+
+FAZER UM TESTE
+
+1. Na tela de login, clique em "Esqueci minha senha".
+2. Digite o email de uma conta existente e envie o formulario.
+3. Volte ao terminal 1 e procure a linha "[DEV] Link de recuperacao de senha".
+4. Abra o link no navegador. Se necessario, copie e cole o endereco completo.
+5. Informe e confirme a nova senha. Ela precisa ter pelo menos 8 caracteres e um simbolo.
+6. Depois da mensagem de sucesso, entre usando a nova senha.
+
+O link e invalido depois de usado ou quando expira. Se pedir outro link, o anterior
+deixa de funcionar.
+
+
+ATUALIZAR O BANCO DE DADOS
+
+A recuperacao usa a tabela "redefinicoes_senha". Para criar essa tabela em um banco
+que ja existe, aplique novamente o arquivo backend\database\schema.sql. O script usa
+CREATE TABLE IF NOT EXISTS e nao apaga os dados existentes.
+
+Se o cliente MySQL estiver no PATH do Windows, a partir da pasta backend execute:
+
+   cmd /c "mysql -u root -p planeja_plus < database\schema.sql"
+
+O comando pedira a senha do MySQL. Faca backup antes de executar alteracoes no banco.
+
+
+ENVIAR EMAIL DE VERDADE
+
+Sem SMTP configurado, o link aparece somente no terminal do backend. Para enviar email:
+
+1. Abra backend\.env.
+2. Configure estas variaveis com os dados fornecidos pelo seu provedor de email:
+
+   FRONTEND_URL=http://localhost:5500
+   PASSWORD_RESET_EXPIRES_MINUTES=60
+   SMTP_HOST=
+   SMTP_PORT=587
+   SMTP_SECURE=false
+   SMTP_USER=
+   SMTP_PASS=
+   MAIL_FROM=Planeja+ <seu-email@seudominio.com>
+
+3. Salve o .env e reinicie a API.
+
+Em producao, FRONTEND_URL deve ser o endereco HTTPS publico do site e o SMTP deve
+estar configurado. Nunca publique o arquivo .env nem compartilhe a senha SMTP.
+
+
+SE ALGO NAO FUNCIONAR
+
+- Confira se a API continua rodando no terminal 1.
+- Confira se o frontend continua rodando no terminal 2 na porta 5500.
+- Se o backend indicar que a tabela redefinicoes_senha nao existe, aplique o schema.
+- Se o link nao chegar por email durante o desenvolvimento, procure-o no terminal da API.
+- Se o link expirou ou ja foi usado, solicite outro pela tela de login.
+- O sistema mostra a mesma resposta para email cadastrado e nao cadastrado, para nao
+  revelar quais enderecos possuem conta.
+
+
+ARQUIVOS PRINCIPAIS
+
+- frontend\login.html: link para iniciar a recuperacao.
+- frontend\esqueci-senha.html: formulario do email.
+- frontend\redefinir-senha.html: formulario da nova senha.
+- backend\controllers\authController.js: validacao e fluxo das rotas.
+- backend\models\RedefinicaoSenha.js: tokens de uso unico e atualizacao no banco.
+- backend\services\emailService.js: envio SMTP ou exibicao local do link.
+- backend\database\schema.sql: tabela de tokens de redefinicao.

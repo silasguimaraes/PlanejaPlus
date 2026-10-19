@@ -11,10 +11,11 @@
     <header class="topbar">
       <a class="brand" href="./index.html">Planeja+</a>
       <nav class="nav">
-        <a href="./dashboard.html">Dashboard</a>
+        <a href="./dashboard.html" data-auth-required>Dashboard</a>
         <a href="./movimentacoes.html">Movimentações</a>
         <a href="./categorias.html">Categorias</a>
         <a href="./relatorios.html">Relatórios</a>
+        <a href="./faq.html">FAQ</a>
         <a href="./login.html">Login</a>
       </nav>
     </header>
@@ -29,7 +30,7 @@
           O que determina seu futuro como empreendedor começa por aqui.
         </p>
         <div class="actions">
-          <a class="button primary" href="./dashboard.html">Ver dashboard</a>
+          <a class="button primary" href="./dashboard.html" data-auth-required>Ver dashboard</a>
           <a class="button secondary" href="./cadastro.html" data-public-registration>Criar conta</a>
         </div>
       </section>
@@ -45,5 +46,6 @@
       </section>
     </main>
     <script src="./js/api-config.js"></script>
+    <script src="./js/appUtils.js"></script>
   </body>
 </html>

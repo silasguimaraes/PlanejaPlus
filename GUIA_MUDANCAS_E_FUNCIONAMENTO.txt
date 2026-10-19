@@ -1,0 +1,213 @@
+GUIA DE MUDANCAS E FUNCIONAMENTO - PLANEJA+
+
+Este documento resume o que foi analisado, implementado e alterado desde o inicio
+do trabalho com a exportacao PDF. Ele tambem explica como testar cada parte.
+
+
+1. EXPORTACAO PDF
+
+No inicio, foi encontrado:
+
+- A funcao ativa de exportacao PDF em frontend\js\relatorios.js.
+- Uma versao visual mais completa guardada em frontend\formatacao-pdf.txt.
+
+A versao do TXT tem cabecalho colorido, cards com receitas/despesas/saldo,
+detalhamento em tabela, paginacao e rodape com numero de paginas. A funcao PDF
+ativa no JavaScript continua sendo a versao simples: mostra o periodo, o resumo
+financeiro e salva relatorio-planeja-plus.pdf.
+
+Importante: nao restauramos a versao grafica do PDF no codigo. O TXT e somente
+uma referencia para retomar esse trabalho depois; ele nao altera o PDF exportado.
+
+Como testar:
+
+1. Entre no sistema e abra Relatorios.
+2. Selecione o periodo e clique em Gerar relatorio.
+3. Clique em Exportar PDF.
+4. Abra o arquivo baixado relatorio-planeja-plus.pdf.
+
+
+2. EXPORTACAO EXCEL (.XLSX)
+
+A exportacao anterior era CSV. CSV permite separar os campos em colunas, mas nao
+salva cores, largura de coluna ou outros estilos. Por isso o botao foi alterado
+para Exportar Excel e passou a gerar um arquivo .xlsx usando ExcelJS.
+
+O que a exportacao ativa faz:
+
+- Usa os filtros de periodo e tipo escolhidos na tela.
+- Agrupa as movimentacoes por categoria e tipo.
+- Exporta as colunas Categoria, Tipo, Quantidade e Total.
+- Mantem Total como valor numerico no arquivo.
+- Cria relatorio-planeja-plus.xlsx.
+
+A versao ativa foi deixada simples intencionalmente, sem cores ou estilos. A
+formatacao visual mais completa esta guardada em frontend\formatacao-excel.txt:
+larguras de coluna, titulo, cabecalho colorido, linhas alternadas, formato de
+moeda, filtro e cabecalho fixo. O TXT e apenas uma copia de referencia; para
+aplicar o visual, a funcao precisa ser copiada de volta para relatorios.js.
+
+O codigo CSV antigo foi removido de relatorios.js por nao ser mais usado.
+
+Como testar:
+
+1. Abra Relatorios e defina os filtros.
+2. Clique em Gerar relatorio e depois em Exportar Excel.
+3. Abra o arquivo .xlsx e confira as quatro colunas e os valores.
+
+
+3. FAQ (PERGUNTAS FREQUENTES)
+
+Foi criada frontend\faq.html, com respostas sobre cadastro, categorias,
+movimentacoes, dashboard, relatorios, exportacoes, recuperacao de senha e erros.
+O link FAQ foi adicionado aos menus das paginas do sistema.
+
+As perguntas usam o elemento details do HTML: clique na pergunta para abrir ou
+fechar a resposta.
+
+
+4. ACESSO A PAGINAS SEM LOGIN
+
+O problema observado era que um visitante podia clicar em Dashboard a partir
+de uma pagina publica. Os links para paginas autenticadas nas telas publicas
+agora usam data-auth-required. O utilitario frontend\js\appUtils.js intercepta
+o clique: se nao houver planeja_token no localStorage, mostra um alerta e leva
+ao login.
+
+As paginas de dados tambem executam requireAuth() para redirecionar acessos
+diretos sem token. Essa verificacao no frontend melhora a navegacao, mas a
+protecao real dos dados continua sendo feita pela API, que exige autenticacao
+nas rotas privadas.
+
+Teste confirmado: sem token, clicar em Dashboard na FAQ mostrou o alerta e
+abriu login.html.
+
+
+5. RECUPERACAO DE SENHA
+
+Fluxo para o usuario:
+
+1. Na tela login.html, clique em Esqueci minha senha.
+2. Digite o email e envie o formulario esqueci-senha.html.
+3. O backend cria um token aleatorio de recuperacao.
+4. O link e enviado por email quando SMTP esta configurado. Em desenvolvimento,
+   sem SMTP, o link aparece no terminal onde a API esta rodando.
+5. Abra o link redefinir-senha.html?token=... e escolha uma nova senha.
+6. Depois do sucesso, o sistema volta para a tela de login.
+
+Regras e protecoes implementadas:
+
+- O token e aleatorio, tem 256 bits e e usado uma unica vez.
+- O banco guarda somente o hash SHA-256 do token, nao o token original.
+- O link expira apos 60 minutos por padrao; PASSWORD_RESET_EXPIRES_MINUTES altera
+  esse prazo.
+- Pedir outro link invalida os links pendentes anteriores do mesmo usuario.
+- A senha nova deve ter pelo menos 8 caracteres, incluir simbolo ou pontuacao e
+  ter no maximo 72 bytes para o bcrypt.
+- A resposta ao pedido e igual para email existente e inexistente, para nao
+  revelar quais enderecos possuem conta.
+- As rotas de recuperacao possuem limites de tentativas.
+
+Arquivos principais:
+
+- frontend\login.html: link para comecar.
+- frontend\esqueci-senha.html e frontend\js\esqueciSenha.js: pedido do link.
+- frontend\redefinir-senha.html e frontend\js\redefinirSenha.js: troca da senha.
+- frontend\js\apiService.js: chamadas do frontend para a API.
+- backend\routes\authRoutes.js: rotas HTTP e limites de tentativas.
+- backend\controllers\authController.js: validacao, tokens e fluxo.
+- backend\models\RedefinicaoSenha.js: armazenamento/uso dos tokens e troca de senha.
+- backend\services\emailService.js: envio de email ou link no terminal local.
+- backend\database\schema.sql: tabela redefinicoes_senha.
+- backend\config\env.js: configuracao de SMTP, URL do site e validade do token.
+
+
+6. PREPARAR O BANCO
+
+A recuperacao precisa da tabela redefinicoes_senha. Para cria-la num banco local
+ja existente, aplique backend\database\schema.sql novamente. O script usa
+CREATE TABLE IF NOT EXISTS e nao apaga os dados das outras tabelas.
+
+A partir da pasta backend, se o cliente MySQL estiver instalado:
+
+   cmd /c "mysql -u root -p planeja_plus < database\schema.sql"
+
+O comando pedira a senha do banco. Faca backup antes de executar comandos no
+banco. Se a tabela ja existir, o schema nao deve recria-la.
+
+
+7. TESTAR RECUPERACAO LOCAL SEM EMAIL
+
+Use dois terminais e mantenha os dois abertos.
+
+Terminal 1 - API:
+
+1. Na pasta principal do projeto:
+
+   cd .\PlanejaMais-main\PlanejaMais-main\backend
+
+2. Inicie o backend:
+
+   npm run dev
+
+Terminal 2 - frontend:
+
+1. Na pasta principal do projeto:
+
+   cd .\PlanejaMais-main\PlanejaMais-main\frontend
+
+2. Inicie um servidor HTTP:
+
+   python -m http.server 5500
+
+3. Abra no navegador:
+
+   http://localhost:5500/login.html
+
+4. Clique em Esqueci minha senha e informe o email de uma conta existente.
+5. Procure no terminal da API a linha "[DEV] Link de recuperacao de senha".
+6. Copie o link completo para o navegador e defina a nova senha.
+
+Nao abra apenas frontend\index.html por file:// para esse teste. O link gerado
+usa FRONTEND_URL, que por padrao e http://localhost:5500.
+
+
+8. CONFIGURAR ENVIO REAL DE EMAIL
+
+O arquivo backend\.env.example mostra as variaveis. Configure no backend\.env,
+sem compartilhar ou publicar esse arquivo:
+
+   FRONTEND_URL=http://localhost:5500
+   PASSWORD_RESET_EXPIRES_MINUTES=60
+   SMTP_HOST=
+   SMTP_PORT=587
+   SMTP_SECURE=false
+   SMTP_USER=
+   SMTP_PASS=
+   MAIL_FROM=Planeja+ <seu-email@seudominio.com>
+
+Use os valores fornecidos pelo provedor de email. Depois de alterar o .env,
+reinicie o backend. Em producao, use FRONTEND_URL HTTPS e configure SMTP; sem
+SMTP em producao, o sistema registra o erro de envio no terminal.
+
+
+9. O QUE FOI VALIDADO
+
+- Sintaxe dos arquivos JavaScript alterados.
+- Carregamento das rotas de autenticacao.
+- Respostas HTTP 400 para email invalido, token invalido e pedido de redefinicao
+  malformado.
+- Alerta e redirecionamento para login ao tentar abrir Dashboard sem sessao.
+- Tela de redefinicao mostra a mensagem e esconde o formulario sem token valido.
+
+Nao foi possivel confirmar neste ambiente o fluxo completo com o banco de dados
+local do usuario nem o envio de email por SMTP. Esses testes dependem do MySQL
+rodando, da tabela criada e, para email real, das credenciais SMTP configuradas.
+
+
+10. ARQUIVOS DE REFERENCIA VISUAL
+
+- frontend\formatacao-pdf.txt: versao visual completa do PDF, ainda nao ativa.
+- frontend\formatacao-excel.txt: versao visual completa do Excel, ainda nao ativa.
+
+Os dois TXT servem como referencia e nao sao executados pelo navegador.

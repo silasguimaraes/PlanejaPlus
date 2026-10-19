@@ -1,7 +1,7 @@
 // Seleciona elementos usados pelos filtros e pela tabela do relatorio.
 const relatorioForm = document.querySelector('.filters');
 const exportarPdfButton = document.querySelector('#exportar-pdf');
-const exportarCsvButton = document.querySelector('#exportar-csv');
+const exportarExcelButton = document.querySelector('#exportar-excel');
 const detalhesTabela = document.querySelector('#relatorio-detalhes');
 const periodoInicioInput = document.querySelector('#periodo-inicio');
 const periodoFimInput = document.querySelector('#periodo-fim');
@@ -190,83 +190,54 @@ function exportarRelatorioPdf() {
   documento.save('relatorio-planeja-plus.pdf');
 }
 
+// ------------------------------------------------------------------------------------------------------------------------------------------------------
+// AQUI COMEÇA A PARTE DE EXPORTAR PARA EXCEL, QUE É MAIS SIMPLES, POIS O EXCEL JA TEM FORMATAÇÃO PRONTA E NAO PRECISA LIDAR COM PAGINAÇÃO.
+// TODAS AS CORES E FORMATAÇÕES DE TEXTO DEVEM TER O MESMO PADRÃO DO SITE, POIS O EXCEL É UMA EXTENSÃO DO SITE, ENTÃO DEVE TER A MESMA IDENTIDADE VISUAL.
+//-------------------------------------------------------------------------------------------------------------------------------------------------------
 
+// EXPORTA OS DADOS AGRUPADOS EM UMA PLANILHA XLSX SIMPLES.
+async function exportarRelatorioExcel() {
+  exportarExcelButton.disabled = true;
 
-// ESPAÇO RESERVADO PARA FUTURA FORMATAÇÃO VISUAL DA EXPORTAÇÃO CSV.
-// A função abaixo exporta os dados atuais; a formatação do CSV será feita aqui depois.
-
-  function exportarRelatorioCSV() {
+  try {
     const detalhes = agruparDetalhes(filtrarMovimentacoes());
+    const workbook = new window.ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Relatório');
     const linhas = [
       ['Categoria', 'Tipo', 'Quantidade', 'Total'],
       ...detalhes.map((item) => [
         item.categoria || 'Sem categoria',
         item.tipo === 'receita' ? 'Receita' : 'Despesa',
         item.quantidade,
-        Number(item.total).toFixed(2).replace('.', ','),
+        Number(item.total),
       ]),
     ];
-  // ===============================================================================================================================================================================
-  // Esse const é o que transforma os dados em CSV, e o \uFEFF é para evitar problemas de acentuação no Excel. 
-  // Foi o CODEX que me indicou usar essa função ja que perdemos muito tempo para arrumar todos os erros de pontuação criados por não imoportar a biblioteca Javascript correta
-  // ===============================================================================================================================================================================
-  
-    const csv = '\uFEFF' + linhas 
-    .map((linha) =>
-    linha
-      .map((valor) => `"${String(valor).replaceAll('"', '""')}"`)
-      .join(';'),
-  )
-  .join('\r\n');
-    const arquivo = new Blob([csv], { type: 'text/csv;charset=utf-8;' });  //CRIA O AQUIVO CSV COM OS DADOS DO RELATORIO
-    const url = URL.createObjectURL(arquivo); //CRIA O ENDEREÇO DO AQUIVO PARA O USUARIO BAIXAR ATRAVES DO NAVEGADOR
-      const link = document.createElement('a'); 
-      //CRIA UM LINK PARA O USUARIO BAIXAR O AQUIVO, ESSE LINK É CRIADO PARA O USUARIO BAIXAR O AQUIVO, POIS O JAVASCRIPT NÃO PERMITE BAIXAR ARQUIVOS DIRETAMENTE SEM UM LINK.
-      // E ELE É INVISIVEL PARA O USUARIO, POIS ELE NÃO PRECISA CLICAR NELE, ELE É CLICADO AUTOMATICAMENTE PELO JAVASCRIPT.
 
-      link.href = url;
-      link.download = 'relatorio-planeja-plus.csv';
-      link.click();
+    worksheet.addRows(linhas);
 
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }
-
-      //===================================================================================================//
-      
-
-      //ESPAÇO RESERVADO PARA FUTURA FORMATAÇÃO VISUAL DA EXPORTAÇÃO CSV.
-
-
-      //===================================================================================================//
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-// Carrega movimentacoes da API e renderiza o primeiro relatorio.
+    const conteudo = await workbook.xlsx.writeBuffer();
+    const arquivo = new Blob([conteudo], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    const url = URL.createObjectURL(arquivo);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'relatorio-planeja-plus.xlsx';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    console.error('Não foi possível exportar o relatório Excel.', error);
+    window.AppUtils.showMessage('Não foi possível exportar o relatório Excel.', 'error');
+  } finally {
+    exportarExcelButton.disabled = false;
+  }
+}
+// Carrega movimentações da API e renderiza o primeiro relatório.
 async function carregarRelatorio() {
   try {
     movimentacoesRelatorio = await window.ApiService.listarMovimentacoes();
     exportarPdfButton.disabled = false;
-    exportarCsvButton.disabled = false;
+    exportarExcelButton.disabled = false;
     atualizarRelatorio();
   } catch (error) {
     console.error(window.AppUtils.getApiError(error));
@@ -282,12 +253,12 @@ relatorioForm.addEventListener('submit', (event) => {
 
 // O botao de PDF chama a funcao de exportacao.
 exportarPdfButton.addEventListener('click', exportarRelatorioPdf);
-exportarCsvButton.addEventListener('click', exportarRelatorioCSV);
+exportarExcelButton.addEventListener('click', exportarRelatorioExcel);
 
 // Protege a pagina, prepara logout e carrega dados iniciais.
 definirPeriodoInicial();
 exportarPdfButton.disabled = true;
-exportarCsvButton.disabled = true;
+exportarExcelButton.disabled = true;
 window.AppUtils.requireAuth();
 window.AppUtils.setupAdminLink();
 window.AppUtils.setupLogout();

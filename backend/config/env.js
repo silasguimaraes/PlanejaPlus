@@ -5,9 +5,14 @@ dotenv.config();
 
 const isProduction = process.env.NODE_ENV === 'production';
 const jwtSecret = process.env.JWT_SECRET;
+const passwordResetExpiresMinutes = Number(process.env.PASSWORD_RESET_EXPIRES_MINUTES || 60);
 
 if (isProduction && (!jwtSecret || jwtSecret.length < 32)) {
   throw new Error('JWT_SECRET deve ser configurado com pelo menos 32 caracteres em producao.');
+}
+
+if (!Number.isInteger(passwordResetExpiresMinutes) || passwordResetExpiresMinutes < 1) {
+  throw new Error('PASSWORD_RESET_EXPIRES_MINUTES deve ser um inteiro positivo.');
 }
 
 // Centraliza as configuracoes do projeto para evitar valores espalhados pelo codigo.
@@ -25,6 +30,20 @@ export const env = {
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean),
+
+  isProduction,
+  frontendUrl: (process.env.FRONTEND_URL || (process.env.FRONTEND_ORIGINS || 'http://localhost:5500').split(',')[0])
+    .trim()
+    .replace(/\/+$/, ''),
+  passwordResetExpiresMinutes,
+  smtp: {
+    host: process.env.SMTP_HOST || '',
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: process.env.SMTP_SECURE === 'true',
+    user: process.env.SMTP_USER || '',
+    pass: process.env.SMTP_PASS || '',
+    from: process.env.MAIL_FROM || 'Planeja+ <nao-responda@planejaplus.local>',
+  },
 
   // Dados de conexao com o banco MySQL.
   database: {
