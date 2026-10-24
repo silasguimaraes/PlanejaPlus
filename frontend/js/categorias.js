@@ -21,7 +21,6 @@ function renderCategorias(categorias) {
               ${window.AppUtils.escapeHtml(categoria.tipo)}
             </span>
           </div>
-          <p class="item-meta">ID: ${categoria.id}</p>
         </article>
       `,
     )

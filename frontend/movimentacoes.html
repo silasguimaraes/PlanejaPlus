@@ -6,7 +6,7 @@
     <title>Movimentações | Planeja+</title>
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
-  <body>
+  <body class="app-page">
     <!-- Cabecalho das paginas internas com navegacao entre modulos. -->
     <header class="topbar">
       <a class="brand" href="./index.html" aria-label="Planeja+">
@@ -15,7 +15,7 @@
       <nav class="nav">
         <a href="./dashboard.html">Dashboard</a>
         <a href="./categorias.html">Categorias</a>
-        <a href="./movimentacoes.html">Movimentações</a>
+        <a href="./movimentacoes.html" aria-current="page">Movimentações</a>
         <a href="./relatorios.html">Relatórios</a>
         <a href="./faq.html">FAQ</a>
         <a href="./admin.html" data-admin-link>Admin</a>
@@ -24,14 +24,16 @@
     </header>
 
     <!-- Grid principal com formulario e lista de movimentacoes. -->
-    <main class="container grid">
-      <!-- Painel do formulario para criar ou editar movimentacoes. -->
-      <section class="panel">
+    <main class="container management-page movements-page">
+      <section class="page-heading management-heading">
+        <p id="mes-atual" class="eyebrow">Movimentações</p>
         <h1>Movimentações</h1>
-        <p class="muted">Crie, edite e exclua entradas financeiras.</p>
+      </section>
 
-        <!-- Formulario controlado pelo movimentacoes.js. -->
-        <form id="movimentacao-form" class="form">
+      <section class="panel management-form-panel">
+        <h2>Nova movimentação</h2>
+
+        <form id="movimentacao-form" class="form movement-form">
           <input name="id" type="hidden" />
 
           <label>
@@ -41,20 +43,20 @@
 
           <label>
             Descrição
-            <input name="descricao" type="text" required />
+            <input name="descricao" type="text" placeholder="Ex.: Restaurante, mercado, etc." required />
           </label>
 
           <div class="form-row">
             <label>
               Valor
-              <input name="valor" type="number" step="0.01" min="0.01" required />
+              <input name="valor" type="number" step="0.01" min="0.01" placeholder="R$" required />
             </label>
 
             <label>
               Tipo
               <select name="tipo" required>
-                <option value="despesa">Despesa</option>
-                <option value="receita">Receita</option>
+                <option value="despesa">Saída</option>
+                <option value="receita">Entrada</option>
               </select>
             </label>
           </div>
@@ -65,17 +67,43 @@
           </label>
 
           <div class="actions compact">
-            <button class="button primary" type="submit">Salvar</button>
+            <button class="button primary" type="submit">Salvar movimentação</button>
             <button id="cancelar-edicao" class="button secondary" type="button">Limpar</button>
           </div>
           <p id="message" class="message" role="status"></p>
         </form>
       </section>
 
-      <!-- Painel onde os cards de movimentacoes sao inseridos pelo JavaScript. -->
-      <section class="panel">
-        <h2>Minhas movimentações</h2>
-        <div id="movimentacoes-lista" class="list"></div>
+      <section class="panel management-list-panel movements-list-panel">
+        <div class="movement-toolbar">
+          <label class="movement-search">
+            <span class="sr-only">Buscar movimentações por descrição</span>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <circle cx="10.8" cy="10.8" r="6.3"></circle>
+              <path d="m15.5 15.5 4.2 4.2"></path>
+            </svg>
+            <input id="buscar-movimentacoes" type="search" placeholder="Buscar por descrição" />
+          </label>
+          <div class="movement-filters" role="group" aria-label="Filtrar movimentações">
+            <button class="movement-filter is-active" type="button" data-filtro="todas" aria-pressed="true">Todas</button>
+            <button class="movement-filter" type="button" data-filtro="receita" aria-pressed="false">Entradas</button>
+            <button class="movement-filter" type="button" data-filtro="despesa" aria-pressed="false">Saídas</button>
+          </div>
+        </div>
+
+        <div class="table-wrap movement-table-wrap">
+          <table class="movement-table">
+            <thead>
+              <tr>
+                <th>Descrição</th>
+                <th>Categoria</th>
+                <th>Data</th>
+                <th class="movement-value-heading">Valor</th>
+              </tr>
+            </thead>
+            <tbody id="movimentacoes-lista"></tbody>
+          </table>
+        </div>
       </section>
     </main>
     <!-- Dependencias e scripts da tela de movimentacoes. -->
@@ -84,5 +112,9 @@
     <script src="./js/apiService.js"></script>
     <script src="./js/appUtils.js"></script>
     <script src="./js/movimentacoes.js"></script>
+    <script>
+      const monthLabel = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(new Date());
+      document.querySelector('#mes-atual').textContent = monthLabel;
+    </script>
   </body>
 </html>

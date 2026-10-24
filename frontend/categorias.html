@@ -6,7 +6,7 @@
     <title>Categorias | Planeja+</title>
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
-  <body>
+  <body class="app-page">
     <!-- Cabecalho das paginas autenticadas. -->
     <header class="topbar">
       <a class="brand" href="./index.html" aria-label="Planeja+">
@@ -14,7 +14,7 @@
       </a>
       <nav class="nav">
         <a href="./dashboard.html">Dashboard</a>
-        <a href="./categorias.html">Categorias</a>
+        <a href="./categorias.html" aria-current="page">Categorias</a>
         <a href="./movimentacoes.html">Movimentações</a>
         <a href="./relatorios.html">Relatórios</a>
         <a href="./faq.html">FAQ</a>
@@ -24,17 +24,20 @@
     </header>
 
     <!-- Grid com formulario de criacao e lista de categorias. -->
-    <main class="container grid">
-      <!-- Painel usado para cadastrar novas categorias. -->
-      <section class="panel">
-        <h1>Categorias</h1>
+    <main class="container management-page categories-page">
+      <section class="page-heading management-heading">
+        <p class="eyebrow">Categorias</p>
+        <h1>Minhas categorias</h1>
+      </section>
+
+      <section class="panel management-form-panel">
+        <h2>Categorias</h2>
         <p class="muted">Cadastre categorias de receita ou despesa.</p>
 
-        <!-- Formulario lido pelo categorias.js. -->
         <form id="categoria-form" class="form">
           <label>
             Nome
-            <input name="nome" type="text" required />
+            <input name="nome" type="text" placeholder="Ex.: Alimentação" required />
           </label>
 
           <label>
@@ -45,14 +48,15 @@
             </select>
           </label>
 
-          <button class="button primary full" type="submit">Criar categoria</button>
+          <button class="button primary full category-create-button" type="submit">
+            <span aria-hidden="true">+</span>
+            Criar categoria
+          </button>
           <p id="message" class="message" role="status"></p>
         </form>
       </section>
 
-      <!-- Painel que recebe a lista renderizada pelo JavaScript. -->
-      <section class="panel">
-        <h2>Minhas categorias</h2>
+      <section class="panel management-list-panel">
         <div id="categorias-lista" class="list"></div>
       </section>
     </main>

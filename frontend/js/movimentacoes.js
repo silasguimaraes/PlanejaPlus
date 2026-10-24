@@ -3,9 +3,12 @@ const movimentacaoForm = document.querySelector('#movimentacao-form');
 const movimentacoesLista = document.querySelector('#movimentacoes-lista');
 const categoriaSelect = movimentacaoForm.elements.categoria_id;
 const cancelarEdicaoButton = document.querySelector('#cancelar-edicao');
+const buscaMovimentacoesInput = document.querySelector('#buscar-movimentacoes');
+const filtrosMovimentacoes = document.querySelector('.movement-filters');
 
 // Cache local usado para encontrar uma movimentacao quando o usuario clicar em editar.
 let movimentacoesCache = [];
+let filtroMovimentacoesAtual = 'todas';
 
 // Limpa o formulario e coloca a data atual como valor padrao.
 function resetForm() {
@@ -26,46 +29,50 @@ function renderCategorias(categorias) {
     .join('');
 }
 
-// Renderiza os cards de movimentacoes na tela.
+function normalizarTexto(texto) {
+  return texto
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('pt-BR');
+}
+
+// Renderiza as movimentacoes filtradas na tabela.
 function renderMovimentacoes(movimentacoes) {
   movimentacoesCache = movimentacoes;
+  const termoBusca = normalizarTexto(buscaMovimentacoesInput.value.trim());
+  const resultados = movimentacoes.filter((movimentacao) => {
+    const correspondeAoTipo =
+      filtroMovimentacoesAtual === 'todas' || movimentacao.tipo === filtroMovimentacoesAtual;
+    const correspondeABusca = normalizarTexto(movimentacao.descricao).includes(termoBusca);
 
-  // Se nao houver dados, mostra uma mensagem simples.
-  if (!movimentacoes.length) {
-    movimentacoesLista.innerHTML = '<p class="empty">Nenhuma movimentação cadastrada.</p>';
+    return correspondeAoTipo && correspondeABusca;
+  });
+
+  if (!resultados.length) {
+    const mensagem = movimentacoes.length
+      ? 'Nenhuma movimentação encontrada para este filtro.'
+      : 'Nenhuma movimentação cadastrada.';
+    movimentacoesLista.innerHTML = `<tr><td class="empty movement-empty" colspan="4">${mensagem}</td></tr>`;
     return;
   }
 
-  // Monta um artigo HTML para cada movimentacao.
-  movimentacoesLista.innerHTML = movimentacoes
+  movimentacoesLista.innerHTML = resultados
     .map(
       (movimentacao) => `
-        <article class="item">
-          <div class="item-header">
-            <div>
-              <p class="item-title">${window.AppUtils.escapeHtml(movimentacao.descricao)}</p>
-              <p class="item-meta">
-                ${window.AppUtils.escapeHtml(movimentacao.categoria_nome)} - ${window.AppUtils.formatDate(
-                  movimentacao.data_movimentacao,
-                )}
-              </p>
+        <tr class="movement-row">
+          <td>
+            <span class="movement-description">${window.AppUtils.escapeHtml(movimentacao.descricao)}</span>
+            <div class="movement-row-actions">
+              <button class="button secondary small" type="button" data-editar="${movimentacao.id}" aria-label="Editar movimentação">Editar</button>
+              <button class="button danger small" type="button" data-excluir="${movimentacao.id}" aria-label="Excluir movimentação">Excluir</button>
             </div>
-            <span class="tag ${movimentacao.tipo === 'receita' ? 'success-soft' : 'danger-soft'}">
-              ${window.AppUtils.escapeHtml(movimentacao.tipo)}
-            </span>
-          </div>
-          <p class="item-value ${movimentacao.tipo === 'receita' ? 'positive' : 'negative'}">
+          </td>
+          <td>${window.AppUtils.escapeHtml(movimentacao.categoria_nome)}</td>
+          <td>${window.AppUtils.formatDate(movimentacao.data_movimentacao)}</td>
+          <td class="movement-value ${movimentacao.tipo === 'receita' ? 'positive' : 'negative'}">
             ${window.AppUtils.formatCurrency(movimentacao.valor)}
-          </p>
-          <div class="actions compact">
-            <button class="button secondary" type="button" data-editar="${movimentacao.id}">
-              Editar
-            </button>
-            <button class="button danger" type="button" data-excluir="${movimentacao.id}">
-              Excluir
-            </button>
-          </div>
-        </article>
+          </td>
+        </tr>
       `,
     )
     .join('');
@@ -108,6 +115,26 @@ movimentacaoForm.addEventListener('submit', async (event) => {
   } catch (error) {
     window.AppUtils.showMessage(window.AppUtils.getApiError(error), 'error');
   }
+});
+
+buscaMovimentacoesInput.addEventListener('input', () => {
+  renderMovimentacoes(movimentacoesCache);
+});
+
+filtrosMovimentacoes.addEventListener('click', (event) => {
+  const botao = event.target.closest('button[data-filtro]');
+
+  if (!botao) {
+    return;
+  }
+
+  filtroMovimentacoesAtual = botao.dataset.filtro;
+  filtrosMovimentacoes.querySelectorAll('button[data-filtro]').forEach((filtro) => {
+    const ativo = filtro === botao;
+    filtro.classList.toggle('is-active', ativo);
+    filtro.setAttribute('aria-pressed', String(ativo));
+  });
+  renderMovimentacoes(movimentacoesCache);
 });
 
 // Trata cliques nos botoes de editar e excluir dentro da lista.

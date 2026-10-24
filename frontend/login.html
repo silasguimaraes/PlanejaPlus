@@ -6,7 +6,7 @@
     <title>Login | Planeja+</title>
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
-  <body>
+  <body class="app-page auth-page">
     <!-- Cabecalho simples da tela de login. -->
     <header class="topbar">
       <a class="brand" href="./index.html" aria-label="Planeja+">
@@ -19,36 +19,40 @@
       </nav>
     </header>
 
-    <!-- Container estreito para centralizar o formulario de entrada. -->
-    <main class="container narrow">
-      <!-- Painel visual que agrupa titulo, texto e formulario. -->
-      <section class="panel">
-        <h1>Entrar</h1>
-        <p class="muted">Acesse com email e senha cadastrados.</p>
+    <div id="auth-bg-field" class="hero-wrapper auth-wrapper">
+      <!-- Container estreito para centralizar o formulario de entrada. -->
+      <main class="container narrow auth-container">
+        <!-- Painel visual que agrupa titulo, texto e formulario. -->
+        <section class="panel">
+          <h1 class="auth-title">Entrar</h1>
+          <p class="muted auth-description">Acesse sua conta Planeja+ para continuar</p>
 
-        <!-- Formulario que envia email e senha para o script login.js. -->
-        <form id="login-form" class="form">
-          <label>
-            Email
-            <input name="email" type="email" required />
-          </label>
+          <!-- Formulario que envia email e senha para o script login.js. -->
+          <form id="login-form" class="form auth-form">
+            <label>
+              <span class="sr-only">Email</span>
+              <input name="email" type="email" placeholder="Email" autocomplete="email" required />
+            </label>
 
-          <label>
-            Senha
-            <input name="senha" type="password" required />
-          </label>
+            <label>
+              <span class="sr-only">Senha</span>
+              <input name="senha" type="password" placeholder="Senha" autocomplete="current-password" required />
+            </label>
 
-          <button class="button primary full" type="submit">Entrar</button>
-          <p id="message" class="message" role="status"></p>
-        </form>
-        <p class="muted"><a class="text-link" href="./esqueci-senha.html">Esqueci minha senha</a></p>
-      </section>
-    </main>
+            <p class="auth-forgot"><a class="text-link" href="./esqueci-senha.html">Esqueci minha senha</a></p>
+            <button class="button primary full" type="submit">Entrar</button>
+            <p id="message" class="message" role="status"></p>
+          </form>
+          <p class="muted auth-footer" data-public-registration>Ainda não tem uma conta? <a class="text-link" href="./cadastro.html">Criar conta</a></p>
+        </section>
+      </main>
+    </div>
     <!-- Bibliotecas e scripts carregados no fim para encontrar o HTML ja montado. -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="./js/api-config.js"></script>
     <script src="./js/apiService.js"></script>
     <script src="./js/appUtils.js"></script>
     <script src="./js/login.js"></script>
+    <script type="module" src="./js/authRibbonGlow.js"></script>
   </body>
 </html>

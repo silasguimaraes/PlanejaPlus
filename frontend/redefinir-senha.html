@@ -7,7 +7,7 @@
     <title>Redefinir senha | Planeja+</title>
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
-  <body>
+  <body class="app-page auth-page">
     <header class="topbar">
       <a class="brand" href="./index.html" aria-label="Planeja+">
         <img src="./img/logo.png" alt="Planeja+" class="brand-logo" />
@@ -18,38 +18,41 @@
       </nav>
     </header>
 
-    <main class="container narrow">
-      <section class="panel">
-        <h1>Nova senha</h1>
-        <p class="muted">Escolha uma nova senha para acessar o Planeja+.</p>
+    <div id="auth-bg-field" class="hero-wrapper auth-wrapper">
+      <main class="container narrow auth-container">
+        <section class="panel">
+          <h1 class="auth-title">Nova senha</h1>
+          <p class="muted auth-description">Escolha uma nova senha para acessar o Planeja+.</p>
 
-        <form id="redefinir-form" class="form">
-          <label>
-            Nova senha
-            <input name="senha" type="password" required minlength="8" maxlength="72" autocomplete="new-password" />
-          </label>
+          <form id="redefinir-form" class="form auth-form">
+            <label>
+              <span class="sr-only">Nova senha</span>
+              <input name="senha" type="password" placeholder="Nova senha" required minlength="8" maxlength="72" autocomplete="new-password" />
+            </label>
 
-          <label>
-            Confirmar nova senha
-            <input name="confirmarSenha" type="password" required minlength="8" maxlength="72" autocomplete="new-password" />
-          </label>
+            <label>
+              <span class="sr-only">Confirmar nova senha</span>
+              <input name="confirmarSenha" type="password" placeholder="Confirmar nova senha" required minlength="8" maxlength="72" autocomplete="new-password" />
+            </label>
 
-          <p class="muted">A senha deve ter pelo menos 8 caracteres e incluir um símbolo.</p>
-          <button class="button primary full" type="submit">Redefinir senha</button>
-          <p id="message" class="message" role="status"></p>
-        </form>
+            <p class="muted">A senha deve ter pelo menos 8 caracteres e incluir um símbolo.</p>
+            <button class="button primary full" type="submit">Redefinir senha</button>
+            <p id="message" class="message" role="status"></p>
+          </form>
 
-        <div id="invalid-link" hidden>
-          <p id="invalid-link-message" class="message error" role="status"></p>
-          <p class="muted"><a class="text-link" href="./esqueci-senha.html">Solicitar um novo link</a></p>
-        </div>
-      </section>
-    </main>
+          <div id="invalid-link" hidden>
+            <p id="invalid-link-message" class="message error" role="status"></p>
+            <p class="muted"><a class="text-link" href="./esqueci-senha.html">Solicitar um novo link</a></p>
+          </div>
+        </section>
+      </main>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="./js/api-config.js"></script>
     <script src="./js/apiService.js"></script>
     <script src="./js/appUtils.js"></script>
     <script src="./js/redefinirSenha.js"></script>
+    <script type="module" src="./js/authRibbonGlow.js"></script>
   </body>
 </html>

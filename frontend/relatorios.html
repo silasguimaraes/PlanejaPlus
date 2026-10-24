@@ -6,7 +6,7 @@
     <title>Relatórios | Planeja+</title>
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
-  <body>
+  <body class="app-page reports-page">
     <!-- Cabecalho das paginas internas com link para sair. -->
     <header class="topbar">
       <a class="brand" href="./index.html" aria-label="Planeja+">
@@ -16,7 +16,7 @@
         <a href="./dashboard.html">Dashboard</a>
         <a href="./movimentacoes.html">Movimentações</a>
         <a href="./categorias.html">Categorias</a>
-        <a href="./relatorios.html">Relatórios</a>
+        <a href="./relatorios.html" aria-current="page">Relatórios</a>
         <a href="./faq.html">FAQ</a>
         <a href="./admin.html" data-admin-link>Admin</a>
         <a href="./login.html" data-logout>Sair</a>
@@ -54,28 +54,63 @@
             </select>
           </label>
 
-          <button class="button primary" type="submit">Gerar relatório</button>
-          <button id="exportar-pdf" class="button secondary" type="button">Exportar PDF</button>
-          <button id="exportar-excel" class="button secondary" type="button">Exportar Excel</button>
-          
+          <button class="button primary report-action" type="submit">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" />
+            </svg>
+            Gerar relatório
+          </button>
+          <button id="exportar-pdf" class="button secondary report-action" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" />
+            </svg>
+            Exportar PDF
+          </button>
+          <button id="exportar-excel" class="button secondary report-action" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" />
+            </svg>
+            Exportar Excel
+          </button>
         </form>
       </section>
 
       <!-- Cards de totais atualizados conforme o filtro do relatorio. -->
-      <section class="stats-grid">
-        <article class="stat-card">
-          <p class="stat-label">Total de receitas</p>
-          <strong id="relatorio-receitas" class="positive">R$ 0,00</strong>
+      <section class="stats-grid report-stats">
+        <article class="stat-card report-stat-card report-stat-card--income">
+          <span class="report-stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m4 16 6-6 4 4 6-8M14 6h6v6" />
+            </svg>
+          </span>
+          <div>
+            <p class="stat-label">Total de receitas</p>
+            <strong id="relatorio-receitas" class="positive">R$ 0,00</strong>
+          </div>
         </article>
 
-        <article class="stat-card">
-          <p class="stat-label">Total de despesas</p>
-          <strong id="relatorio-despesas" class="negative">R$ 0,00</strong>
+        <article class="stat-card report-stat-card report-stat-card--expenses">
+          <span class="report-stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m4 8 6 6 4-4 6 8m-6 0h6v-6" />
+            </svg>
+          </span>
+          <div>
+            <p class="stat-label">Total de despesas</p>
+            <strong id="relatorio-despesas" class="negative">R$ 0,00</strong>
+          </div>
         </article>
 
-        <article class="stat-card">
-          <p class="stat-label">Resultado</p>
-          <strong id="relatorio-saldo">R$ 0,00</strong>
+        <article class="stat-card report-stat-card report-stat-card--balance">
+          <span class="report-stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M5 12h14" />
+            </svg>
+          </span>
+          <div>
+            <p class="stat-label">Resultado</p>
+            <strong id="relatorio-saldo">R$ 0,00</strong>
+          </div>
         </article>
       </section>
 
