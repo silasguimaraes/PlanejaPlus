@@ -70,6 +70,15 @@ function agruparPorMes(movimentacoes) {
   };
 }
 
+function preencherSaudacao() {
+  const elemento = document.querySelector('#usuario-nome');
+  const nome = window.AppUtils.getCurrentUser()?.nome;
+
+  if (elemento && nome) {
+    elemento.textContent = nome.trim().split(/\s+/)[0];
+  }
+}
+
 // Preenche os cards superiores do dashboard com os valores calculados.
 function preencherCards(resumo) {
   document.querySelector('#receitas-totais').textContent = window.AppUtils.formatCurrency(
@@ -79,6 +88,76 @@ function preencherCards(resumo) {
     resumo.despesas,
   );
   document.querySelector('#saldo-atual').textContent = window.AppUtils.formatCurrency(resumo.saldo);
+  preencherBarraSaldo(resumo);
+}
+
+function preencherBarraSaldo(resumo) {
+  const barra = document.querySelector('.saldo-bar');
+  const preenchimento = document.querySelector('#saldo-bar-fill');
+  const texto = document.querySelector('#saldo-bar-texto');
+
+  if (!barra || !preenchimento || !texto) {
+    return;
+  }
+
+  const percentual = resumo.receitas > 0
+    ? Math.round(Math.max(0, Math.min(100, (resumo.saldo / resumo.receitas) * 100)))
+    : 0;
+
+  preenchimento.classList.toggle('negative', resumo.saldo < 0);
+  preenchimento.style.width = `${resumo.saldo < 0 ? 100 : percentual}%`;
+  barra.setAttribute('aria-valuenow', String(percentual));
+
+  if (resumo.receitas <= 0) {
+    texto.textContent = 'Cadastre receitas para acompanhar o saldo.';
+    barra.setAttribute('aria-valuetext', 'Sem receitas cadastradas');
+  } else if (resumo.saldo < 0) {
+    const deficit = Math.abs(resumo.saldo);
+    texto.textContent = `Despesas acima das receitas em ${window.AppUtils.formatCurrency(deficit)}`;
+    barra.setAttribute('aria-valuetext', `Saldo negativo de ${window.AppUtils.formatCurrency(deficit)}`);
+  } else {
+    texto.textContent = `${percentual}% das receitas registradas permaneceram como saldo`;
+    barra.setAttribute('aria-valuetext', `${percentual}% das receitas registradas`);
+  }
+}
+
+function renderUltimasMovimentacoes(movimentacoes) {
+  const container = document.querySelector('#ultimas-movimentacoes');
+
+  if (!container) {
+    return;
+  }
+
+  const recentes = [...movimentacoes]
+    .sort((a, b) => new Date(b.data_movimentacao) - new Date(a.data_movimentacao))
+    .slice(0, 5);
+
+  if (!recentes.length) {
+    container.innerHTML =
+      '<tr><td colspan="4" class="empty">Nenhuma movimentação registrada ainda.</td></tr>';
+    return;
+  }
+
+  container.innerHTML = recentes
+    .map((movimentacao) => {
+      const receita = movimentacao.tipo === 'receita';
+      const tipo = receita ? 'receita' : 'despesa';
+
+      return `
+        <tr>
+          <td>
+            <span class="ultima-descricao">${window.AppUtils.escapeHtml(movimentacao.descricao)}</span>
+            <span class="tag ${receita ? 'success-soft' : 'danger-soft'}">${tipo}</span>
+          </td>
+          <td>${window.AppUtils.escapeHtml(movimentacao.categoria_nome || 'Sem categoria')}</td>
+          <td>${window.AppUtils.formatDate(movimentacao.data_movimentacao)}</td>
+          <td class="col-value ${receita ? 'positive' : 'negative'}">
+            ${receita ? '+ ' : '− '}${window.AppUtils.formatCurrency(movimentacao.valor)}
+          </td>
+        </tr>
+      `;
+    })
+    .join('');
 }
 
 // Cria o grafico de pizza que mostra a distribuicao das despesas por categoria.
@@ -174,6 +253,7 @@ async function carregarDashboard() {
     preencherCards(resumo);
     criarGraficoCategorias(categorias);
     criarGraficoMensal(mensal);
+    renderUltimasMovimentacoes(movimentacoes);
   } catch (error) {
     console.error(window.AppUtils.getApiError(error));
   }
@@ -183,4 +263,5 @@ async function carregarDashboard() {
 window.AppUtils.requireAuth();
 window.AppUtils.setupAdminLink();
 window.AppUtils.setupLogout();
+preencherSaudacao();
 carregarDashboard();

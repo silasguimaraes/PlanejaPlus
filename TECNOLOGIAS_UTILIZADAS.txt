@@ -1,0 +1,57 @@
+TECNOLOGIAS UTILIZADAS NO PLANEJA+
+
+Este arquivo resume as tecnologias encontradas no projeto, incluindo os
+elementos gráficos e as animações da interface.
+
+INTERFACE E ELEMENTOS GRAFICOS
+
+- HTML5: estrutura das paginas, formularios, navegacao, tabelas e dashboard.
+- CSS3: estilos, layout responsivo, cores, efeitos de hover, transicoes e
+  animacoes da interface.
+- JavaScript: interacoes das paginas, atualizacao dos dados e comunicacao com
+  a API. O frontend usa JavaScript diretamente no navegador, sem um framework
+  como React ou Vue.
+- WebGL 2 e GLSL: usados pelo modulo ribbonGlow.js para desenhar a animaçãoo
+  luminosa interativa que acompanha o movimento do cursor na tela inicial.
+- Chart.js: graficos de despesas por categoria e comparacao mensal de receitas
+  e despesas no dashboard.
+- Imagens PNG: logo Planeja+ e icones de saldo, receita e despesa.
+
+COMUNICACAO E RELATORIOS
+
+- Axios: requisicoes HTTP do frontend para a API.
+- jsPDF: geracao de relatorios em PDF.
+- ExcelJS: geracao de planilhas Excel (.xlsx).
+
+BACKEND
+
+- Node.js: ambiente JavaScript usado para executar o servidor da API.
+- Express: criacao da API e organizacao das rotas HTTP.
+- mysql2: conexao do backend com o banco de dados MySQL.
+- JSON Web Token (jsonwebtoken): autenticacao das rotas protegidas.
+- bcryptjs: protecao de senhas com hash.
+- Nodemailer: envio de emails para recuperacao de senha quando o SMTP esta
+  configurado.
+- dotenv: leitura das configuracoes do ambiente armazenadas em arquivo .env.
+- cors: configuracao de acesso a API a partir do frontend.
+- express-rate-limit: limitacao de tentativas em rotas da API.
+- nodemon: reinicio automatico do servidor durante o desenvolvimento.
+
+BANCO DE DADOS
+
+- MySQL: armazenamento de usuarios, categorias, movimentacoes e dados de
+  recuperacao de senha.
+- SQL: definicao das tabelas e consultas ao banco.
+
+FERRAMENTAS DE EXECUCAO
+
+- npm: instalacao de dependencias e execucao dos comandos do backend.
+- Navegador moderno: execucao do frontend e dos graficos.
+- Servidor HTTP local: recomendado para servir os arquivos do frontend durante
+  o desenvolvimento. O README documenta Python como uma opcao para isso.
+
+OBSERVACAO
+
+As bibliotecas usadas pelo frontend, como Axios, Chart.js, jsPDF e ExcelJS,
+sao carregadas pelas paginas HTML. As dependencias do backend estao listadas
+em backend/package.json.

@@ -6,10 +6,12 @@
     <title>Dashboard | Planeja+</title>
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
-  <body>
+  <body class="dashboard-body">
     <!-- Cabecalho das paginas internas com link de logout. -->
     <header class="topbar">
-      <a class="brand" href="./index.html">Planeja+</a>
+      <a class="brand" href="./index.html" aria-label="Planeja+">
+        <img src="./img/logo.png" alt="Planeja+" class="brand-logo" />
+      </a>
       <nav class="nav">
         <a href="./dashboard.html">Dashboard</a>
         <a href="./movimentacoes.html">Movimentações</a>
@@ -26,25 +28,45 @@
       <!-- Titulo e descricao da tela. -->
       <section class="page-heading">
         <p class="eyebrow">Visão geral</p>
-        <h1>Dashboard financeiro</h1>
+        <h1>Olá, <span id="usuario-nome">usuário</span></h1>
         <p class="muted">Resumo financeiro calculado a partir das movimentações cadastradas.</p>
       </section>
 
       <!-- Cards preenchidos pelo dashboard.js com saldo, receitas e despesas. -->
       <section class="stats-grid">
-        <article class="stat-card">
-          <p class="stat-label">Saldo atual</p>
-          <strong id="saldo-atual">R$ 0,00</strong>
+        <article class="stat-card stat-card--saldo">
+          <div class="stat-card-info">
+            <p class="stat-label">Saldo atual</p>
+            <strong id="saldo-atual">R$ 0,00</strong>
+            <div
+              class="saldo-bar"
+              role="progressbar"
+              aria-label="Percentual das receitas que permaneceu como saldo"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+            >
+              <div id="saldo-bar-fill" class="saldo-bar-fill"></div>
+            </div>
+            <p id="saldo-bar-texto" class="saldo-bar-texto">Aguardando movimentações</p>
+          </div>
+          <img class="stat-icon" src="./img/icon-saldo.png" alt="" aria-hidden="true" />
         </article>
 
         <article class="stat-card">
-          <p class="stat-label">Receitas totais</p>
-          <strong id="receitas-totais" class="positive">R$ 0,00</strong>
+          <div class="stat-card-info">
+            <p class="stat-label">Receitas totais</p>
+            <strong id="receitas-totais" class="positive">R$ 0,00</strong>
+          </div>
+          <img class="stat-icon" src="./img/icon-receita.png" alt="" aria-hidden="true" />
         </article>
 
         <article class="stat-card">
-          <p class="stat-label">Despesas totais</p>
-          <strong id="despesas-totais" class="negative">R$ 0,00</strong>
+          <div class="stat-card-info">
+            <p class="stat-label">Despesas totais</p>
+            <strong id="despesas-totais" class="negative">R$ 0,00</strong>
+          </div>
+          <img class="stat-icon" src="./img/icon-despesa.png" alt="" aria-hidden="true" />
         </article>
       </section>
 
@@ -73,6 +95,26 @@
             <canvas id="grafico-mensal"></canvas>
           </div>
         </article>
+      </section>
+
+      <section class="panel ultimas-section">
+        <div class="panel-heading ultimas-heading">
+          <h2>Últimas movimentações</h2>
+          <a class="link-ver-todas" href="./movimentacoes.html">Ver todas</a>
+        </div>
+        <div class="table-wrap ultimas-table-wrap">
+          <table class="ultimas-table">
+            <thead>
+              <tr>
+                <th>Descrição</th>
+                <th>Categoria</th>
+                <th>Data</th>
+                <th class="col-value">Valor</th>
+              </tr>
+            </thead>
+            <tbody id="ultimas-movimentacoes"></tbody>
+          </table>
+        </div>
       </section>
     </main>
     <!-- Bibliotecas externas e scripts locais usados pelo dashboard. -->

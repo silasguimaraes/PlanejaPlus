@@ -9,7 +9,9 @@
   <body>
     <!-- Cabecalho com marca e links principais da aplicacao. -->
     <header class="topbar">
-      <a class="brand" href="./index.html">Planeja+</a>
+      <a class="brand" href="./index.html" aria-label="Planeja+">
+        <img src="./img/logo.png" alt="Planeja+" class="brand-logo" />
+      </a>
       <nav class="nav">
         <a href="./dashboard.html" data-auth-required>Dashboard</a>
         <a href="./movimentacoes.html">Movimentações</a>
@@ -20,32 +22,52 @@
       </nav>
     </header>
 
-    <!-- Conteudo inicial que apresenta o sistema e leva para as telas principais. -->
-    <main class="container hero">
-      <!-- Bloco de chamada principal da pagina inicial. -->
-      <section class="hero-content">
-        <p class="eyebrow">Controle financeiro para Microempreendedores individual</p>
-        <h1>Planeje suas financas com uma interface clara e objetiva.</h1>
-        <p>
-          O que determina seu futuro como empreendedor começa por aqui.
-        </p>
-        <div class="actions">
-          <a class="button primary" href="./dashboard.html" data-auth-required>Ver dashboard</a>
-          <a class="button secondary" href="./cadastro.html" data-public-registration>Criar conta</a>
-        </div>
-      </section>
+    <div id="hero-bg-field" class="hero-wrapper">
+      <main class="container hero">
+        <section class="hero-content">
+          <p class="eyebrow">Controle financeiro para microempreendedores individuais</p>
+          <h1>Planeje suas finanças com uma interface clara e objetiva.</h1>
+          <p class="hero-description">O que determina seu futuro como empreendedor começa por aqui.</p>
+          <div class="actions">
+            <a class="button primary" href="./dashboard.html" data-auth-required>Ver dashboard</a>
+            <a class="button secondary" href="./cadastro.html" data-public-registration>Criar conta</a>
+          </div>
+        </section>
 
-      <!-- Painel lateral com um resumo das telas existentes no projeto. -->
-      <section class="panel summary-panel">
-        <h2>Planeja+</h2>
-        <ol class="steps">
-          <li>Organização</li>
-          <li>Planejamento</li>
-          <li>Exportação</li>
-        </ol>
-      </section>
-    </main>
+        <div class="stack" aria-label="Etapas do Planeja+">
+          <div class="card">
+            <div class="image">
+              <h2>Planeja+</h2>
+              <ol class="steps">
+                <li><span>1</span>Organização</li>
+                <li><span>2</span>Planejamento</li>
+                <li><span>3</span>Exportação</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
     <script src="./js/api-config.js"></script>
     <script src="./js/appUtils.js"></script>
+    <script type="module">
+      import { initRibbonGlow } from './js/ribbonGlow.js';
+
+      const heroWrapper = document.getElementById('hero-bg-field');
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (heroWrapper && !reducedMotion) {
+        initRibbonGlow(heroWrapper, {
+          background: '#f7f8ff',
+          color1: '#ffffff',
+          color2: '#5667d9',
+          size: 134,
+          speed: 50,
+          angle: -180,
+          hover: 100,
+          reach: 240,
+        });
+      }
+    </script>
   </body>
 </html>
