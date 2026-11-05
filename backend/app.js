@@ -1,5 +1,7 @@
 import cors from 'cors';
 import express from 'express';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { env } from './config/env.js';
 import { errorMiddleware } from './middleware/errorMiddleware.js';
 import routes from './routes/index.js';
@@ -21,6 +23,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Concentra todas as rotas da API abaixo do prefixo /api.
 app.use('/api', routes);
+
+// Serve as paginas da pasta frontend no mesmo dominio da API (usado na Vercel).
+const frontendDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '../frontend');
+app.use(express.static(frontendDir, { extensions: ['html'] }));
 
 // Deixa o tratamento de erro por ultimo para capturar problemas das rotas anteriores.
 app.use(errorMiddleware);
