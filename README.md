@@ -1,27 +1,21 @@
  # Planeja+
 
-**PASSO A PASSO PLANEJA MAIS**
+## Inicializacao rapida
 
-1- ABRA O TERMINAL NO VSCODE
-
-2-DIGITE cd planejamais TECLE TAB
-
-3-DIGITE cd backend TECLE TAB
-
-4-DIGITE npm run dev
-
-5-RODAR O PROJETO NO INDEX.HTML 
+1. Instale o Node.js 20 ou superior.
+2. No terminal do VS Code, entre na pasta `backend`.
+3. Execute `npm install` e crie `backend/.env` a partir de `.env.example`.
+4. Execute `npm run dev` e abra `http://localhost:3000` no navegador.
 
 
 - Frontend: HTML, CSS e JavaScript
 - Backend: Node.js + Express
-- Banco de dados: MySQL
+- Banco de dados local: SQLite (arquivo em `backend/database/`)
 
 ## Pre-requisitos
 
-- Node.js 18 ou superior
+- Node.js 20 ou superior
 - npm
-- MySQL rodando localmente
 - Navegador moderno
   - Axios
   - Chart.js
@@ -80,7 +74,9 @@ No Windows PowerShell, se `cp` nao funcionar:
 Copy-Item .env.example .env
 ```
 
-Edite `backend/.env` com suas credenciais do MySQL:
+O projeto usa SQLite localmente e nao precisa de um servidor de banco separado.
+Mantenha `SQLITE_PATH` sem configurar para usar o arquivo padrao do projeto.
+O arquivo `.env` criado a partir do exemplo ja permite iniciar o backend.
 
 ```env
 PORT=3000
@@ -88,17 +84,6 @@ JWT_SECRET=
 JWT_EXPIRES_IN=1d
 ALLOW_PUBLIC_REGISTRATION=true
 FRONTEND_ORIGINS=http://localhost:5500
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=sua_senha
-DB_NAME=planeja_plus
-```
-
-Crie o banco MySQL (se ainda nao existir):
-
-```bash
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS planeja_plus"
 ```
 
 Configure o `.env` com o banco e inicie a API. As migrations sao executadas automaticamente antes de o servidor aceitar requisicoes:
@@ -138,9 +123,12 @@ O health check retorna `503` se o banco nao estiver acessivel.
 
 ## Rodar o frontend
 
-Com o backend ligado, abra `frontend/index.html` no navegador.
+Inicie o backend e abra `http://localhost:3000`. O backend tambem serve o
+frontend; nao e necessario abrir o arquivo HTML diretamente nem iniciar outro
+servidor.
 
-Recomendado: servir a pasta por HTTP.
+Se preferir usar o Live Server do VS Code, configure-o para aceitar conexoes da
+rede local. O frontend nessa porta usa a API em `:3000`.
 
 ```bash
 cd frontend
@@ -152,6 +140,38 @@ Acesse:
 ```text
 http://localhost:5500
 ```
+
+## Acessar em outro computador na mesma rede
+
+O computador que hospeda o projeto deve permanecer ligado, conectado ao mesmo
+Wi-Fi/rede e com o backend em execucao. O outro computador precisa apenas de um
+navegador; os dois acessam o mesmo arquivo SQLite no computador hospedeiro.
+
+1. No computador hospedeiro, abra o PowerShell e execute `ipconfig`. Anote o
+   endereco IPv4 do adaptador Wi-Fi ou Ethernet, por exemplo `192.168.1.25`.
+2. No VS Code, abra `backend/.env`. Se usar a pagina servida pelo proprio
+   backend em `:3000`, nenhuma origem adicional e necessaria. Se usar Live Server
+   na rede, inclua a origem dele, por exemplo:
+
+   ```env
+   FRONTEND_ORIGINS=http://localhost:5500,http://192.168.1.25:5500
+   ```
+
+   Troque o IP pelo endereco real do computador hospedeiro. Reinicie o backend
+   depois de alterar o `.env`.
+3. Execute `npm run dev` na pasta `backend`. Se o Windows perguntar, permita o
+   Node.js somente em redes privadas. Se nao aparecer a pergunta e a conexao
+   falhar, permita o Node.js na Firewall do Windows para redes privadas ou crie
+   uma regra de entrada TCP para a porta `3000`, restrita a redes privadas.
+4. No outro computador, abra `http://192.168.1.25:3000`, substituindo pelo IP
+   anotado. Se estiver usando Live Server, abra `http://192.168.1.25:5500`.
+5. Se o endereco IP mudar, atualize o endereco usado no navegador e, se
+   necessario, `FRONTEND_ORIGINS`. Para evitar mudancas, configure uma reserva
+   DHCP no roteador.
+
+Use somente em uma rede privada confiavel. Nao configure encaminhamento de portas
+no roteador para expor esse servidor a internet. Quando o computador desligar,
+dormir ou o backend for encerrado, os outros dispositivos perderao o acesso.
 <!-- O JWT SECRET PUXA INFORMAÇÕES SEM EXPOR O PROVEDOR -->
 ## Publicar a API
 

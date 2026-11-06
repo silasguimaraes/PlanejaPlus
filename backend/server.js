@@ -5,8 +5,8 @@ import { runMigrations } from './database/migrationRunner.js';
 async function startServer() {
   await runMigrations();
 
-  // Inicia o servidor na porta configurada no arquivo .env ou no valor padrao.
-  app.listen(env.port, () => {
+  // Escuta nas interfaces de rede para permitir acesso local por outros dispositivos.
+  app.listen(env.port, '0.0.0.0', () => {
     // Mostra no terminal que a API esta pronta para receber requisicoes.
     console.log(`Servidor rodando na porta ${env.port}`);
   });

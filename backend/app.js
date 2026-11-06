@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express from 'express';
+import { fileURLToPath } from 'node:url';
 import { env } from './config/env.js';
 import { errorMiddleware } from './middleware/errorMiddleware.js';
 import routes from './routes/index.js';
@@ -8,10 +9,12 @@ import routes from './routes/index.js';
 const app = express();
 app.set('trust proxy', 1);
 
-// Libera chamadas do frontend durante o desenvolvimento. Em ambiente local o frontend pode
-// ser servido em localhost, 127.0.0.1 ou em IPs da rede, entao usamos a origem da requisicao
-// em vez de bloquear apenas uma lista estreita.
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({
+  origin(origin, callback) {
+    callback(null, !origin || env.frontendOrigins.includes(origin));
+  },
+  credentials: true,
+}));
 
 // Ensina o Express a ler dados enviados em JSON no corpo das requisicoes.
 app.use(express.json());
@@ -21,6 +24,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Concentra todas as rotas da API abaixo do prefixo /api.
 app.use('/api', routes);
+
+// Permite abrir o frontend pela mesma origem da API, inclusive em outros dispositivos da rede.
+app.use(express.static(fileURLToPath(new URL('../frontend/', import.meta.url))));
 
 // Deixa o tratamento de erro por ultimo para capturar problemas das rotas anteriores.
 app.use(errorMiddleware);
