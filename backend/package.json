@@ -21,9 +21,9 @@
     "express-rate-limit": "^8.7.0",
     "jsonwebtoken": "latest",
     "mysql2": "latest",
-    "nodemailer": "^7.0.10"
+    "nodemailer": "^10.3.1"
   },
   "devDependencies": {
-    "nodemon": "latest"
+    "nodemon": "^3.1.11"
   }
 }
