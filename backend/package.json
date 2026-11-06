@@ -7,10 +7,13 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "db:migrate": "node database/runMigrations.js",
-    "db:seed": "node database/seed.js"
+    "db:seed": "node database/seed.js",
+    "db:import-mysql": "node database/importMySql.js",
+    "test": "node --test"
   },
   "dependencies": {
     "bcryptjs": "latest",
+    "better-sqlite3": "^12.4.1",
     "cors": "latest",
     "dotenv": "latest",
     "express": "latest",

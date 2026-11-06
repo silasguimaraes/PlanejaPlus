@@ -9,8 +9,8 @@ class Admin {
         (SELECT COUNT(*) FROM usuarios) AS total_usuarios,
         (SELECT COUNT(*) FROM usuarios WHERE ativo = 1) AS usuarios_ativos,
         (SELECT COUNT(*) FROM movimentacoes) AS total_movimentacoes,
-        (SELECT COALESCE(SUM(valor), 0) FROM movimentacoes WHERE tipo = 'receita') AS total_receitas,
-        (SELECT COALESCE(SUM(valor), 0) FROM movimentacoes WHERE tipo = 'despesa') AS total_despesas`,
+        (SELECT ROUND(COALESCE(SUM(valor), 0), 2) FROM movimentacoes WHERE tipo = 'receita') AS total_receitas,
+        (SELECT ROUND(COALESCE(SUM(valor), 0), 2) FROM movimentacoes WHERE tipo = 'despesa') AS total_despesas`,
     );
 
     return rows[0];
@@ -36,7 +36,8 @@ class Admin {
   static async atualizarUsuario({ id, perfil, ativo }) {
     const [result] = await pool.execute(
       `UPDATE usuarios
-       SET perfil = COALESCE(?, perfil), ativo = COALESCE(?, ativo)
+       SET perfil = COALESCE(?, perfil), ativo = COALESCE(?, ativo),
+           atualizado_em = CURRENT_TIMESTAMP
        WHERE id = ?`,
       [perfil ?? null, ativo ?? null, id],
     );

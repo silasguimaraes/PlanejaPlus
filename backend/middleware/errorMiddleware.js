@@ -1,7 +1,11 @@
 // Middleware centralizado para tratar erros que acontecerem nas rotas.
 export function errorMiddleware(err, req, res, next) {
-  // ER_DUP_ENTRY acontece quando o MySQL bloqueia um valor repetido, como email duplicado.
-  if (err.code === 'ER_DUP_ENTRY') {
+  // Ambos os drivers usam codigos diferentes para informar uma chave UNIQUE duplicada.
+  if (
+    err.code === 'ER_DUP_ENTRY' ||
+    err.code === 'SQLITE_CONSTRAINT_UNIQUE' ||
+    err.code === 'SQLITE_CONSTRAINT_PRIMARYKEY'
+  ) {
     return res.status(409).json({ message: 'Registro já existente.' });
   }
 

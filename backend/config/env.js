@@ -1,4 +1,6 @@
 import dotenv from 'dotenv';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // Carrega as variaveis do arquivo .env para dentro de process.env.
 dotenv.config();
@@ -45,12 +47,19 @@ export const env = {
     from: process.env.MAIL_FROM || 'Planeja+ <nao-responda@planejaplus.local>',
   },
 
-  // Dados de conexao com o banco MySQL.
+  // Caminho persistente do arquivo SQLite, relativo ao backend quando configurado.
   database: {
-    host: process.env.DB_HOST || 'localhost',
-    port: Number(process.env.DB_PORT || 3306),
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    name: process.env.DB_NAME || 'planeja_plus',
+    sqlitePath: resolve(
+      process.env.SQLITE_PATH ||
+        fileURLToPath(new URL('../database/planeja_plus.sqlite', import.meta.url)),
+    ),
+    // Credenciais opcionais usadas somente pelo importador do banco MySQL antigo.
+    mysqlSource: {
+      host: process.env.MYSQL_HOST || process.env.DB_HOST || 'localhost',
+      port: Number(process.env.MYSQL_PORT || process.env.DB_PORT || 3306),
+      user: process.env.MYSQL_USER || process.env.DB_USER || 'root',
+      password: process.env.MYSQL_PASSWORD || process.env.DB_PASSWORD || '',
+      name: process.env.MYSQL_DATABASE || process.env.DB_NAME || 'planeja_plus',
+    },
   },
 };

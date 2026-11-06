@@ -9,7 +9,7 @@ class Categoria {
       [usuarioId, nome, tipo],
     );
 
-    // Monta o objeto de retorno usando o id gerado pelo MySQL.
+    // Monta o objeto de retorno usando o id gerado pelo SQLite.
     return {
       id: result.insertId,
       usuario_id: usuarioId,
@@ -29,6 +29,54 @@ class Categoria {
     );
 
     return rows;
+  }
+
+  // Apaga apenas categorias do usuario e preserva as movimentacoes vinculadas.
+  static async delete({ id, usuarioId }) {
+    const connection = await pool.getConnection();
+    let transactionStarted = false;
+
+    try {
+      await connection.beginTransaction();
+      transactionStarted = true;
+
+      const [categorias] = await connection.execute(
+        'SELECT id FROM categorias WHERE id = ? AND usuario_id = ? LIMIT 1',
+        [id, usuarioId],
+      );
+
+      if (!categorias.length) {
+        await connection.rollback();
+        transactionStarted = false;
+        return { deleted: false, inUse: false };
+      }
+
+      const [movimentacoes] = await connection.execute(
+        'SELECT id FROM movimentacoes WHERE categoria_id = ? LIMIT 1',
+        [id],
+      );
+
+      if (movimentacoes.length) {
+        await connection.rollback();
+        transactionStarted = false;
+        return { deleted: false, inUse: true };
+      }
+
+      await connection.execute('DELETE FROM categorias WHERE id = ? AND usuario_id = ?', [
+        id,
+        usuarioId,
+      ]);
+      await connection.commit();
+      transactionStarted = false;
+      return { deleted: true, inUse: false };
+    } catch (error) {
+      if (transactionStarted) {
+        await connection.rollback();
+      }
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
 }
 

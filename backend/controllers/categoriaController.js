@@ -27,3 +27,21 @@ export async function listarCategorias(req, res) {
 
   return res.json(categorias);
 }
+
+// Exclui uma categoria livre sem permitir que ela remova movimentacoes financeiras.
+export async function excluirCategoria(req, res) {
+  const { id } = req.params;
+  const resultado = await Categoria.delete({ id, usuarioId: req.usuario.id });
+
+  if (!resultado.deleted && resultado.inUse) {
+    return res.status(409).json({
+      message: 'Não é possível excluir uma categoria que possui movimentações vinculadas.',
+    });
+  }
+
+  if (!resultado.deleted) {
+    return res.status(404).json({ message: 'Categoria não encontrada.' });
+  }
+
+  return res.status(204).send();
+}

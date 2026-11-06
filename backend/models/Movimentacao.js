@@ -1,5 +1,11 @@
 import { pool } from '../database/connection.js';
 
+// Arredonda valores para duas casas decimais, como o DECIMAL(10, 2) do MySQL.
+function normalizarValor(valor) {
+  const numero = Number(valor);
+  return Math.round((numero + Number.EPSILON) * 100) / 100;
+}
+
 // Model que concentra as consultas SQL relacionadas a movimentacoes financeiras.
 class Movimentacao {
   // Cria uma movimentacao somente se a categoria informada pertencer ao usuario.
@@ -10,7 +16,16 @@ class Movimentacao {
        SELECT ?, categorias.id, ?, ?, ?, ?
        FROM categorias
       WHERE categorias.id = ? AND categorias.usuario_id = ? AND categorias.tipo = ?`,
-          [usuarioId, descricao, valor, tipo, dataMovimentacao, categoriaId, usuarioId, tipo],
+          [
+            usuarioId,
+            descricao,
+            normalizarValor(valor),
+            tipo,
+            dataMovimentacao,
+            categoriaId,
+            usuarioId,
+            tipo,
+          ],
     );
 
     // affectedRows igual a zero indica que a categoria nao foi encontrada para esse usuario.
@@ -91,21 +106,29 @@ class Movimentacao {
 
     await pool.execute(
       `UPDATE movimentacoes
-       INNER JOIN categorias
-        ON categorias.id = ?
-        AND categorias.usuario_id = movimentacoes.usuario_id
-        AND categorias.tipo = ?
-       SET
-        movimentacoes.categoria_id = categorias.id,
-        movimentacoes.descricao = ?,
-        movimentacoes.valor = ?,
-        movimentacoes.tipo = ?,
-        movimentacoes.data_movimentacao = ?
-       WHERE movimentacoes.id = ? AND movimentacoes.usuario_id = ?`,
-      [categoriaId, tipo, descricao, valor, tipo, dataMovimentacao, id, usuarioId],
+       SET categoria_id = ?, descricao = ?, valor = ?, tipo = ?,
+           data_movimentacao = ?, atualizado_em = CURRENT_TIMESTAMP
+       WHERE id = ? AND usuario_id = ?
+         AND EXISTS (
+           SELECT 1 FROM categorias
+           WHERE categorias.id = ?
+             AND categorias.usuario_id = movimentacoes.usuario_id
+             AND categorias.tipo = ?
+         )`,
+      [
+        categoriaId,
+        descricao,
+        normalizarValor(valor),
+        tipo,
+        dataMovimentacao,
+        id,
+        usuarioId,
+        categoriaId,
+        tipo,
+      ],
     );
 
-    // Uma atualizacao identica pode ter zero linhas alteradas no MySQL, mas continuar valida.
+    // O registro e relido porque o driver SQLite nao retorna os dados atualizados no UPDATE.
     return this.findByIdAndUsuario({ id, usuarioId });
   }
 

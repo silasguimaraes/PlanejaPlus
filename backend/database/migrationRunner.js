@@ -1,26 +1,17 @@
-import { env } from '../config/env.js';
 import { pool } from './connection.js';
 import { migrations } from './migrations/index.js';
 
-const migrationLockName = `planeja_plus_migrations_${env.database.name}`;
-
 export async function runMigrations() {
   const connection = await pool.getConnection();
-  let lockAcquired = false;
+  let transactionStarted = false;
 
   try {
-    const [lockRows] = await connection.query('SELECT GET_LOCK(?, 30) AS acquired', [
-      migrationLockName,
-    ]);
-
-    if (Number(lockRows[0]?.acquired) !== 1) {
-      throw new Error('Não foi possível obter o bloqueio para executar as migrations.');
-    }
-
-    lockAcquired = true;
+    // O bloqueio de escrita do SQLite serializa migrations entre processos.
+    await connection.beginTransaction();
+    transactionStarted = true;
     await connection.query(
       `CREATE TABLE IF NOT EXISTS schema_migrations (
-        version VARCHAR(100) NOT NULL PRIMARY KEY,
+        version TEXT NOT NULL PRIMARY KEY,
         applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
       )`,
     );
@@ -40,14 +31,18 @@ export async function runMigrations() {
       ]);
     }
 
+    // Publica as alteracoes somente depois de todas as migrations serem aplicadas.
+    await connection.commit();
+    transactionStarted = false;
     console.log('Migrations atualizadas.');
-  } finally {
-    try {
-      if (lockAcquired) {
-        await connection.query('SELECT RELEASE_LOCK(?)', [migrationLockName]);
-      }
-    } finally {
-      connection.release();
+  } catch (error) {
+    // Desfaz o schema parcial para que uma inicializacao seguinte possa tentar de novo.
+    if (transactionStarted) {
+      await connection.rollback();
     }
+
+    throw error;
+  } finally {
+    connection.release();
   }
 }

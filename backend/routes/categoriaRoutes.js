@@ -1,5 +1,9 @@
 import { Router } from 'express';
-import { criarCategoria, listarCategorias } from '../controllers/categoriaController.js';
+import {
+  criarCategoria,
+  excluirCategoria,
+  listarCategorias,
+} from '../controllers/categoriaController.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 
@@ -14,5 +18,8 @@ router.post('/', asyncHandler(criarCategoria));
 
 // GET /categorias lista as categorias do usuario logado.
 router.get('/', asyncHandler(listarCategorias));
+
+// DELETE /categorias/:id remove uma categoria que nao tenha movimentacoes.
+router.delete('/:id', asyncHandler(excluirCategoria));
 
 export default router;

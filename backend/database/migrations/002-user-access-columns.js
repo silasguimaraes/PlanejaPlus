@@ -1,24 +1,24 @@
 export const version = '002-user-access-columns';
 
 export async function up(connection) {
-  const [columns] = await connection.query(
-    `SELECT COLUMN_NAME
-     FROM information_schema.COLUMNS
-     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'usuarios'`,
-  );
-  const existingColumns = new Set(columns.map((column) => column.COLUMN_NAME));
+  // Consulta os metadados nativos do SQLite para manter a migration idempotente.
+  const [columns] = await connection.query('PRAGMA table_info(usuarios)');
+  const existingColumns = new Set(columns.map((column) => column.name));
 
   if (!existingColumns.has('perfil')) {
     await connection.execute(
-      "ALTER TABLE usuarios ADD COLUMN perfil ENUM('usuario', 'admin') NOT NULL DEFAULT 'usuario'",
+      "ALTER TABLE usuarios ADD COLUMN perfil TEXT NOT NULL DEFAULT 'usuario' CHECK (perfil IN ('usuario', 'admin'))",
     );
   }
 
   if (!existingColumns.has('ativo')) {
-    await connection.execute('ALTER TABLE usuarios ADD COLUMN ativo BOOLEAN NOT NULL DEFAULT TRUE');
+    await connection.execute(
+      'ALTER TABLE usuarios ADD COLUMN ativo INTEGER NOT NULL DEFAULT 1 CHECK (ativo IN (0, 1))',
+    );
   }
 
+  // Normaliza registros antigos que possam ter valores nulos nessas colunas.
   await connection.execute(
-    "UPDATE usuarios SET perfil = COALESCE(perfil, 'usuario'), ativo = COALESCE(ativo, TRUE) WHERE perfil IS NULL OR ativo IS NULL",
+    "UPDATE usuarios SET perfil = COALESCE(perfil, 'usuario'), ativo = COALESCE(ativo, 1) WHERE perfil IS NULL OR ativo IS NULL",
   );
 }
