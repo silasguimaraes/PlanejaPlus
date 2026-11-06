@@ -8,9 +8,33 @@ dotenv.config();
 const isProduction = process.env.NODE_ENV === 'production';
 const jwtSecret = process.env.JWT_SECRET;
 const passwordResetExpiresMinutes = Number(process.env.PASSWORD_RESET_EXPIRES_MINUTES || 60);
+const frontendOrigins = (process.env.FRONTEND_ORIGINS || (isProduction ? '' : 'http://localhost:5500'))
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const frontendUrl = (process.env.FRONTEND_URL || frontendOrigins[0] || '').trim().replace(/\/+$/, '');
 
 if (isProduction && (!jwtSecret || jwtSecret.length < 32)) {
   throw new Error('JWT_SECRET deve ser configurado com pelo menos 32 caracteres em producao.');
+}
+
+if (isProduction && frontendOrigins.length === 0) {
+  throw new Error('FRONTEND_ORIGINS deve conter a origem HTTPS do frontend em producao.');
+}
+
+if (isProduction && frontendOrigins.some((origin) => {
+  try {
+    const url = new URL(origin);
+    return url.protocol !== 'https:' || url.origin !== origin;
+  } catch {
+    return true;
+  }
+})) {
+  throw new Error('FRONTEND_ORIGINS deve conter somente origens HTTPS validas, sem caminhos.');
+}
+
+if (isProduction && !frontendOrigins.includes(frontendUrl)) {
+  throw new Error('FRONTEND_URL deve corresponder a uma origem configurada em FRONTEND_ORIGINS.');
 }
 
 if (!Number.isInteger(passwordResetExpiresMinutes) || passwordResetExpiresMinutes < 1) {
@@ -28,15 +52,10 @@ export const env = {
   allowPublicRegistration:
     process.env.ALLOW_PUBLIC_REGISTRATION === 'true' ||
     (!isProduction && process.env.ALLOW_PUBLIC_REGISTRATION !== 'false'),
-  frontendOrigins: (process.env.FRONTEND_ORIGINS || 'http://localhost:5500')
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean),
+  frontendOrigins,
 
   isProduction,
-  frontendUrl: (process.env.FRONTEND_URL || (process.env.FRONTEND_ORIGINS || 'http://localhost:5500').split(',')[0])
-    .trim()
-    .replace(/\/+$/, ''),
+  frontendUrl,
   passwordResetExpiresMinutes,
   smtp: {
     host: process.env.SMTP_HOST || '',

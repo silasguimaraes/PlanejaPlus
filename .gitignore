@@ -39,3 +39,8 @@ Thumbs.db
 *.pid
 *.seed
 *.pid.lock
+
+# Bancos SQLite locais; arquivos ja versionados precisam ser removidos do Git
+# separadamente, depois de criar e verificar uma copia de seguranca.
+backend/database/*.sqlite
+backend/database/*.sqlite-*

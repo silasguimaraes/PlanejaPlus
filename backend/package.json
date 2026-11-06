@@ -9,6 +9,7 @@
     "db:migrate": "node database/runMigrations.js",
     "db:seed": "node database/seed.js",
     "db:import-mysql": "node database/importMySql.js",
+    "admin:create": "node scripts/createAdmin.js",
     "test": "node --test"
   },
   "dependencies": {

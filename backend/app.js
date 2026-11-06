@@ -8,10 +8,13 @@ import routes from './routes/index.js';
 const app = express();
 app.set('trust proxy', 1);
 
-// Libera chamadas do frontend durante o desenvolvimento. Em ambiente local o frontend pode
-// ser servido em localhost, 127.0.0.1 ou em IPs da rede, entao usamos a origem da requisicao
-// em vez de bloquear apenas uma lista estreita.
-app.use(cors({ origin: true, credentials: true }));
+// Em producao, permite somente as origens HTTPS configuradas para o frontend.
+app.use(cors({
+  origin(origin, callback) {
+    callback(null, !origin || env.frontendOrigins.includes(origin));
+  },
+  credentials: true,
+}));
 
 // Ensina o Express a ler dados enviados em JSON no corpo das requisicoes.
 app.use(express.json());

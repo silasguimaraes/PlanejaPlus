@@ -10,6 +10,7 @@ const testDirectory = await mkdtemp(join(tmpdir(), 'planeja-plus-sqlite-'));
 process.env.SQLITE_PATH = join(testDirectory, 'test.sqlite');
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-secret-with-more-than-thirty-two-characters';
+process.env.FRONTEND_ORIGINS = 'http://localhost:5500';
 
 // Importa os modulos depois de definir o arquivo isolado e as configuracoes de teste.
 const [{ default: app }, { pool }, { runMigrations }, { default: Admin }, { default: Usuario }, { default: Categoria }, { default: Movimentacao }, { default: RedefinicaoSenha }] =
@@ -42,6 +43,21 @@ test('SQLite mantém os fluxos atuais e permite excluir categorias sem perder mo
     server = app.listen(0);
     await once(server, 'listening');
     const baseUrl = `http://127.0.0.1:${server.address().port}/api`;
+
+    await t.test('CORS aceita apenas as origens configuradas', async () => {
+      const origemPermitida = await fetch(`${baseUrl}/health`, {
+        headers: { Origin: 'http://localhost:5500' },
+      });
+      assert.equal(
+        origemPermitida.headers.get('access-control-allow-origin'),
+        'http://localhost:5500',
+      );
+
+      const origemBloqueada = await fetch(`${baseUrl}/health`, {
+        headers: { Origin: 'https://origem-nao-configurada.example' },
+      });
+      assert.equal(origemBloqueada.headers.get('access-control-allow-origin'), null);
+    });
 
     // Faz requisicoes JSON para exercitar autenticacao, rotas e tratamento de erros.
     async function request(path, { method = 'GET', token, body } = {}) {

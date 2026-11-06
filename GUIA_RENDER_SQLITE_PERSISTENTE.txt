@@ -1,0 +1,216 @@
+OBJETIVO: PUBLICAR O PLANEJA+ NO RENDER COM SQLITE PERSISTENTE
+===========================================================
+
+Objetivo
+--------
+Deixar a API e o banco em um servidor online, para que duas pessoas possam
+usar a mesma conta e os mesmos dados pelo navegador. O computador de quem
+acessa precisa apenas de internet e um navegador; não precisa ter VS Code,
+Node.js ou SQLite instalados.
+
+Esta configuração usa o Render como exemplo. O backend atual usa SQLite.
+O SQLite é um arquivo local, portanto ele deve ficar dentro de um disco
+persistente do Render. O disco persistente requer um serviço pago. Confira
+preços e limites atuais antes de contratar.
+
+
+1. PREPARAR O REPOSITÓRIO E PROTEGER OS DADOS
+---------------------------------------------
+Antes de publicar:
+
+1. Confira se o repositório GitHub é privado ou público.
+2. O arquivo abaixo está versionado no projeto:
+
+   backend/database/planeja_plus.sqlite
+
+   Também há arquivos SQLite auxiliares terminados em -wal e -shm.
+   Verifique se o banco contém usuários, e-mails, movimentações ou outros dados
+   reais. Não publique um banco com dados pessoais ou de teste que devam ser
+   privados. Senhas ficam armazenadas como hashes, mas isso não torna adequado
+   publicar o arquivo.
+   Se o repositório for público, trate qualquer dado pessoal dentro desse banco
+   como exposto. Tornar o repositório privado ou apagar o arquivo no commit mais
+   recente não remove as cópias que possam existir no histórico Git ou em clones.
+   Não envie o banco para a hospedagem antes de resolver a privacidade e a
+   transferência segura dos dados.
+3. O banco anexado ao disco persistente do Render será um banco novo. As
+   migrations criam as tabelas, mas não copiam automaticamente os registros do
+   arquivo versionado ou do computador local.
+4. Se precisar levar dados existentes, planeje uma migração controlada e faça
+   uma cópia de segurança antes. Não copie o arquivo SQLite enquanto a API
+   estiver escrevendo nele.
+5. O projeto agora inclui um comando interativo para criar o primeiro
+   administrador no banco configurado:
+
+   cd backend
+   npm run admin:create
+
+   Execute-o somente depois que SQLITE_PATH apontar para o banco correto. O
+   comando solicita nome, e-mail e senha no terminal; a senha é ocultada durante
+   a digitação. Se a conta já existir, a senha digitada precisa corresponder à
+   conta para promovê-la. O comando para se já houver um administrador ativo.
+
+
+O QUE VOCÊ PRECISA FAZER ANTES DA PUBLICAÇÃO
+--------------------------------------------
+Como ainda não há uma conta Render e você não quer assumir custos agora, nada
+será publicado nem cobrado nesta etapa. Quando decidir avançar:
+
+1. Crie uma conta Render e confirme o preço do Web Service com disco persistente.
+   Só prossiga se aceitar o custo recorrente.
+2. Confirme se o repositório GitHub é privado. O arquivo SQLite está versionado;
+   não faça push de uma cópia com dados pessoais. Se o repositório já foi público,
+   tornar privado agora não apaga o histórico nem eventuais clones.
+3. Decida se deseja migrar o banco local atual. A transferência ainda não foi
+   feita; será necessário criar um backup consistente e seguir um procedimento
+   seguro para levar esse banco ao disco persistente.
+4. Tenha acesso à conta GitHub dona do repositório e escolha um domínio para o
+   frontend. Não envie senhas, tokens ou credenciais pelo chat.
+5. Depois da publicação, valide o banco, o login administrador, o cadastro de
+   outros usuários, as operações principais e a restauração de um backup antes
+   de usar dados importantes.
+
+
+2. AJUSTES NECESSÁRIOS NO CÓDIGO
+-------------------------------
+O backend já permite definir o caminho do banco pela variável SQLITE_PATH.
+No Render, configure:
+
+   SQLITE_PATH=/var/data/planeja_plus.sqlite
+
+O caminho /var/data precisa ser o caminho de montagem do disco persistente.
+Não use o banco dentro da pasta temporária do código para dados de produção.
+
+O frontend atualmente aponta para http://localhost:3000/api. Antes de publicar,
+altere frontend/js/api-config.js para usar o endereço HTTPS da API criada no
+Render, terminando em /api. Exemplo ilustrativo:
+
+   window.API_BASE_URL = 'https://NOME-DA-API.onrender.com/api';
+
+Substitua NOME-DA-API pelo endereço real. Não deixe o frontend publicado
+apontando para localhost: isso tentaria acessar o computador de cada visitante.
+
+O backend agora valida a lista FRONTEND_ORIGINS. Em desenvolvimento, ela usa
+http://localhost:5500 por padrão. Em produção, FRONTEND_ORIGINS é obrigatória e
+deve conter a origem HTTPS exata do frontend, sem caminho e sem barra final.
+Exemplo:
+
+   FRONTEND_ORIGINS=https://NOME-DO-SITE.onrender.com
+
+O CORS permite somente essas origens nos navegadores; CORS não substitui
+autenticação nem controle de acesso da API.
+
+
+3. CRIAR O SERVIÇO WEB DA API NO RENDER
+---------------------------------------
+1. Envie ao GitHub apenas as alterações revisadas e necessárias para a
+   publicação. Não inclua .env, senhas, tokens ou bancos com dados pessoais.
+   O SQLite atual já está versionado; o .gitignore não deixa de rastrear arquivos
+   que já foram adicionados ao Git. Não faça commit/push do banco sem antes
+   decidir como os dados serão migrados e removê-lo do rastreamento de forma
+   coordenada, preservando uma cópia segura.
+2. No Render, escolha New + e crie um Web Service conectado ao repositório.
+3. Configure:
+
+   Root Directory: backend
+   Build Command:  npm install
+   Start Command:  npm start
+
+   Use uma versão Node.js suportada pelo better-sqlite3 do projeto (Node 20
+   ou superior; prefira uma versão LTS suportada pelo Render).
+4. Adicione um disco persistente ao serviço:
+
+   Mount Path: /var/data
+   Size: escolha conforme o uso e o plano contratado
+
+   O disco é uma opção paga. Sem ele, o sistema de arquivos do serviço é
+   temporário e o arquivo SQLite pode desaparecer em reinícios ou deploys.
+5. Configure as variáveis de ambiente do Web Service:
+
+   NODE_ENV=production
+   SQLITE_PATH=/var/data/planeja_plus.sqlite
+   JWT_SECRET=um-segredo-aleatorio-com-pelo-menos-32-caracteres
+   FRONTEND_ORIGINS=https://NOME-DO-SITE.onrender.com
+   FRONTEND_URL=https://NOME-DO-SITE.onrender.com
+   ALLOW_PUBLIC_REGISTRATION=false
+
+   Gere um JWT_SECRET longo e aleatório. Guarde-o no painel do Render; não o
+   coloque no GitHub, no frontend ou neste arquivo de configuração.
+6. Publique o serviço e abra a URL /api/health. Confirme que a API responde.
+   Na primeira inicialização, as migrations criam as tabelas no banco vazio do
+   disco. Verifique os logs para confirmar que as migrations terminaram.
+7. Antes de abrir o site para outros usuários, crie o administrador no banco
+   persistente. Use um terminal interativo com o ambiente do serviço e execute
+   o comando a partir da pasta backend:
+
+   cd backend
+   npm run admin:create
+
+   A disponibilidade de terminal remoto depende do plano e da configuração do
+   serviço. Confirme isso no painel/documentação do Render. O comando usa
+   SQLITE_PATH do serviço. Não crie o administrador apontando para um banco
+   local diferente.
+
+
+4. PUBLICAR O FRONTEND
+----------------------
+1. No Render, crie um Static Site ligado ao mesmo repositório.
+2. Configure:
+
+   Root Directory: frontend
+   Build Command:  deixe vazio se o painel permitir
+   Publish Directory: .
+
+3. Altere frontend/js/api-config.js para a URL HTTPS real da API, terminando
+   em /api, e publique novamente o frontend.
+4. Configure FRONTEND_ORIGINS no serviço da API para a origem HTTPS do Static
+   Site. Se o domínio do frontend mudar, atualize a origem e teste novamente.
+5. Abra o site HTTPS e teste login, leitura e gravação de dados com contas de
+   teste. Não use dados reais até validar o backup e a recuperação.
+
+
+5. BACKUP E OPERAÇÃO
+--------------------
+- Faça backups periódicos do arquivo SQLite guardado em /var/data e mantenha
+  uma cópia em local seguro, separada do serviço.
+- O Render documenta snapshots diários para discos persistentes, retidos por
+  sete dias. Confira no painel se o recurso está ativo para o plano escolhido;
+  snapshots da plataforma não substituem uma cópia própria.
+- Teste a restauração de um backup antes de depender dele.
+- Não tente baixar/copiar o arquivo enquanto a API estiver gravando nele.
+  Pare o serviço ou use um processo de backup consistente do SQLite.
+- Evite publicar múltiplas instâncias da API usando o mesmo arquivo SQLite.
+- Proteja os dados: use HTTPS, mantenha NODE_ENV=production, use um JWT_SECRET
+  forte e restrinja o cadastro público depois da criação controlada das contas.
+- A recuperação de senha por e-mail requer configuração SMTP. Sem SMTP, o link
+  de redefinição é registrado no log do backend, o que não é adequado para uso
+  público em produção.
+
+
+LIMITAÇÕES E GARANTIAS
+----------------------
+- Os dois usuários acessam a mesma base porque a API no Render usa um único
+  arquivo SQLite no disco persistente.
+- O computador de quem acessa não precisa baixar o projeto; basta abrir a URL
+  HTTPS do frontend.
+- Se o disco for removido, o serviço for apagado, o plano mudar ou houver falha,
+  ainda pode haver perda de dados. Backups independentes são necessários.
+- SQLite é adequado para este uso inicial com poucos acessos simultâneos. Se o
+  número de usuários ou o volume crescer, considere migrar para PostgreSQL
+  gerenciado.
+- A URL do frontend, CORS e o comando de criação do administrador estão
+  preparados no código. A migração dos registros do banco local, a configuração
+  do Render e a verificação de backups ainda precisam ser feitas antes da
+  publicação.
+
+
+DOCUMENTAÇÃO OFICIAL
+--------------------
+Discos persistentes do Render:
+https://render.com/docs/disks
+
+Web Services do Render:
+https://render.com/docs/web-services
+
+Static Sites do Render:
+https://render.com/docs/static-sites
