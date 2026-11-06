@@ -211,7 +211,8 @@ function renderUltimasMovimentacoes(movimentacoes) {
   container.innerHTML = recentes
     .map((movimentacao) => {
       const receita = movimentacao.tipo === 'receita';
-      const tipo = receita ? 'receita' : 'despesa';
+      // Apresenta o tipo com inicial maiuscula apenas no rotulo da tabela.
+      const tipo = receita ? 'Receita' : 'Despesa';
 
       return `
         <tr>

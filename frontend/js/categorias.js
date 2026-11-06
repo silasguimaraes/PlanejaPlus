@@ -33,12 +33,45 @@ function renderCategorias(categorias) {
                 categoria.tipo.charAt(0).toUpperCase() + categoria.tipo.slice(1),
               )}
             </span>
+            <button
+              class="button danger category-delete"
+              type="button"
+              data-excluir-categoria="${categoria.id}"
+              aria-label="Excluir categoria ${window.AppUtils.escapeHtml(categoria.nome)}"
+            >
+              Excluir
+            </button>
           </div>
         </article>
       `,
     )
     .join('');
 }
+
+// Exclui a categoria escolhida e atualiza os filtros sem perder o estado da tela.
+categoriasLista.addEventListener('click', async (event) => {
+  const botao = event.target.closest('button[data-excluir-categoria]');
+
+  if (!botao) {
+    return;
+  }
+
+  const categoria = categoriasCache.find(
+    (item) => String(item.id) === botao.dataset.excluirCategoria,
+  );
+
+  if (!categoria || !window.confirm(`Deseja excluir a categoria "${categoria.nome}"?`)) {
+    return;
+  }
+
+  try {
+    await window.ApiService.excluirCategoria(categoria.id);
+    window.AppUtils.showMessage('Categoria excluída com sucesso.');
+    await carregarCategorias();
+  } catch (error) {
+    window.AppUtils.showMessage(window.AppUtils.getApiError(error), 'error');
+  }
+});
 
 filtrosCategorias.addEventListener('click', (event) => {
   const botao = event.target.closest('button[data-filtro]');

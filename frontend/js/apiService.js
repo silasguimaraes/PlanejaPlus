@@ -89,6 +89,11 @@ const ApiService = {
     return response.data;
   },
 
+  // Remove uma categoria, recebendo erro do backend se ela tiver movimentacoes.
+  async excluirCategoria(id) {
+    await api.delete(`/categorias/${id}`);
+  },
+
   // Cria uma nova movimentacao.
   async criarMovimentacao(dados) {
     const response = await api.post('/movimentacoes', dados);

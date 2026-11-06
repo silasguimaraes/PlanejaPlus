@@ -1,14 +1,17 @@
-const { escapeHtml, formatCurrency, formatDate, getApiError, showMessage } = window.AppUtils;
+// Usa o utilitario global por namespace para evitar redeclarar nomes de appUtils.js.
+const adminUtils = window.AppUtils;
 
 const usuariosTabela = document.querySelector('#usuarios-tabela');
+const adminStatus = document.querySelector('#admin-status');
 let usuarioLogadoId = null;
 
 function renderResumo(resumo) {
-  document.querySelector('#total-usuarios').textContent = resumo.total_usuarios;
-  document.querySelector('#usuarios-ativos').textContent = resumo.usuarios_ativos;
-  document.querySelector('#total-movimentacoes').textContent = resumo.total_movimentacoes;
-  document.querySelector('#total-receitas').textContent = formatCurrency(resumo.total_receitas);
-  document.querySelector('#total-despesas').textContent = formatCurrency(resumo.total_despesas);
+  // Converte os valores agregados antes de apresenta-los para evitar campos vazios.
+  document.querySelector('#total-usuarios').textContent = Number(resumo.total_usuarios);
+  document.querySelector('#usuarios-ativos').textContent = Number(resumo.usuarios_ativos);
+  document.querySelector('#total-movimentacoes').textContent = Number(resumo.total_movimentacoes);
+  document.querySelector('#total-receitas').textContent = adminUtils.formatCurrency(resumo.total_receitas);
+  document.querySelector('#total-despesas').textContent = adminUtils.formatCurrency(resumo.total_despesas);
 }
 
 function renderUsuarios(usuarios) {
@@ -20,7 +23,7 @@ function renderUsuarios(usuarios) {
   usuariosTabela.innerHTML = usuarios
     .map((u) => {
       const ehAdmin = u.perfil === 'admin';
-      const ehVoce = u.id === usuarioLogadoId;
+      const ehVoce = Number(u.id) === usuarioLogadoId;
 
       const acoes = ehVoce
         ? '<span class="item-meta">Você</span>'
@@ -35,11 +38,11 @@ function renderUsuarios(usuarios) {
 
       return `
         <tr class="${u.ativo ? '' : 'inativo'}">
-          <td>${escapeHtml(u.nome)}</td>
-          <td>${escapeHtml(u.email)}</td>
+          <td>${adminUtils.escapeHtml(u.nome)}</td>
+          <td>${adminUtils.escapeHtml(u.email)}</td>
           <td><span class="tag ${ehAdmin ? 'admin-soft' : ''}">${ehAdmin ? 'admin' : 'usuário'}</span></td>
           <td>${u.total_movimentacoes}</td>
-          <td>${formatDate(u.criado_em)}</td>
+          <td>${adminUtils.formatDate(u.criado_em)}</td>
           <td class="col-acoes">${acoes}</td>
         </tr>`;
     })
@@ -49,6 +52,8 @@ function renderUsuarios(usuarios) {
 }
 
 async function carregar() {
+  adminStatus.textContent = 'Carregando dados do painel...';
+
   try {
     const [resumo, usuarios] = await Promise.all([
       window.ApiService.adminResumo(),
@@ -57,13 +62,25 @@ async function carregar() {
 
     renderResumo(resumo);
     renderUsuarios(usuarios);
+    adminStatus.textContent = `Dados atualizados. ${usuarios.length} usuário(s) encontrado(s).`;
   } catch (error) {
+    // Informa falta de permissao sem redirecionar silenciosamente nem exibir zeros falsos.
     if ([401, 403].includes(error.response?.status)) {
-      window.location.href = './dashboard.html';
+      adminStatus.textContent =
+        'Não foi possível carregar o painel: entre com uma conta de administrador ativa.';
+      document.querySelectorAll('.admin-stats strong').forEach((value) => {
+        value.textContent = '—';
+      });
+      usuariosTabela.innerHTML =
+        '<tr><td colspan="6" class="empty">Os dados administrativos não estão disponíveis para esta conta.</td></tr>';
       return;
     }
 
-    showMessage(getApiError(error), 'error');
+    adminStatus.textContent = 'Não foi possível carregar os dados. Confira se a API está em execução e tente novamente.';
+    document.querySelectorAll('.admin-stats strong').forEach((value) => {
+      value.textContent = '—';
+    });
+    adminUtils.showMessage(adminUtils.getApiError(error), 'error');
   }
 }
 
@@ -90,10 +107,10 @@ usuariosTabela.addEventListener('click', async (event) => {
       await window.ApiService.adminExcluirUsuario(id);
     }
 
-    showMessage('Alteração salva.');
+    adminUtils.showMessage('Alteração salva.');
     carregar();
   } catch (error) {
-    showMessage(getApiError(error), 'error');
+    adminUtils.showMessage(adminUtils.getApiError(error), 'error');
   }
 });
 

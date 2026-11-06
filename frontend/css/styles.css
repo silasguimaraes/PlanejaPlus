@@ -22,6 +22,48 @@
   box-sizing: border-box;
 }
 
+/* Evita deslocamentos horizontais quando paginas diferentes precisam de rolagem vertical. */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Suaviza a troca entre paginas HTML quando o navegador oferece suporte. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: page-transition-out 120ms ease-out both;
+}
+
+::view-transition-new(root) {
+  animation: page-transition-in 160ms ease-out both;
+}
+
+@keyframes page-transition-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes page-transition-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* Evita que o link Admin altere a largura do menu apos o primeiro desenho. */
+:root:not([data-user-is-admin="true"]) [data-admin-link] {
+  display: none !important;
+}
+
 /* Estilos base do corpo da pagina. */
 body {
   margin: 0;
@@ -108,8 +150,6 @@ a {
 }
 
 .nav a[aria-current="page"] {
-  padding-right: 16px;
-  padding-left: 16px;
   background: #e8edff;
   color: var(--primary-dark);
 }
@@ -1799,8 +1839,6 @@ th {
 }
 
 .reports-body .nav a[aria-current="page"] {
-  padding-right: 16px;
-  padding-left: 16px;
   background: #e8edff;
   color: var(--primary-dark);
 }
@@ -2022,15 +2060,28 @@ th {
   margin-top: 4px;
 }
 
+/* Mantem o detalhamento compacto e rolavel mesmo quando ha muitas linhas. */
 .reports-detail-panel .table-wrap {
-  min-height: 270px;
+  min-height: min(270px, 60vh);
+  max-height: min(60vh, 560px);
   margin-top: 24px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .reports-table {
   min-width: 680px;
   color: #293653;
   font-size: 0.88rem;
+}
+
+/* Mantem os titulos visiveis enquanto o usuario rola o detalhamento. */
+.reports-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f5f7fc;
 }
 
 .reports-table th,
@@ -2080,8 +2131,7 @@ th {
   }
 
   .reports-body .nav a[aria-current="page"] {
-    padding-right: 10px;
-    padding-left: 10px;
+    background: #e8edff;
   }
 
   .reports-page {
@@ -2146,8 +2196,6 @@ th {
 }
 
 .categories-body .nav a[aria-current="page"] {
-  padding-right: 16px;
-  padding-left: 16px;
   background: #e8edff;
   color: var(--primary-dark);
 }
@@ -2299,8 +2347,10 @@ th {
 }
 
 .categories-page .item-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .categories-page .item-title {
@@ -2316,12 +2366,33 @@ th {
   line-height: 1.4;
 }
 
+/* Padroniza tamanho e alinhamento das etiquetas de receita e despesa. */
 .categories-page .tag {
-  flex: 0 0 auto;
-  min-height: 32px;
-  padding: 5px 14px;
-  font-size: 0.9rem;
+  display: inline-flex;
+  flex: 0 0 96px;
+  width: 96px;
+  min-height: 30px;
+  padding: 5px 10px;
+  justify-content: center;
+  font-size: 0.85rem;
   font-weight: 700;
+  text-transform: capitalize;
+}
+
+/* Mantem o botao de exclusao compacto, alinhado e com destaque pastel. */
+.categories-page .category-delete {
+  min-height: 30px;
+  border-radius: 8px;
+  padding: 5px 9px;
+  background: #fff1f2;
+  border-color: #f4c9ce;
+  color: #b94b5a;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.categories-page .category-delete:hover {
+  background: #ffe4e6;
 }
 
 @media (max-width: 800px) {
@@ -2369,11 +2440,6 @@ th {
     font-size: 0.8rem;
   }
 
-  .categories-body .nav a[aria-current="page"] {
-    padding-right: 10px;
-    padding-left: 10px;
-  }
-
   .categories-page {
     width: calc(100% - 28px);
     gap: 18px;
@@ -2404,8 +2470,6 @@ th {
 }
 
 .transactions-body .nav a[aria-current="page"] {
-  padding-right: 16px;
-  padding-left: 16px;
   background: #e8edff;
   color: var(--primary-dark);
 }
@@ -2574,10 +2638,22 @@ th {
 
 .transactions-layout .transactions-table-wrap {
   margin-top: 18px;
+  /* Mantem a tabela dentro de uma area rolavel, mesmo quando ha muitos registros. */
+  max-height: min(60vh, 620px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .transactions-layout .transactions-table {
   min-width: 560px;
+}
+
+.transactions-layout .transactions-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--panel);
 }
 
 .transactions-layout .transactions-table th,
@@ -2725,11 +2801,6 @@ th {
   .transactions-body .nav a {
     padding: 0.6rem 0.35rem;
     font-size: 0.8rem;
-  }
-
-  .transactions-body .nav a[aria-current="page"] {
-    padding-right: 10px;
-    padding-left: 10px;
   }
 
   .transactions-layout .transaction-form-panel .form-row {
@@ -3035,8 +3106,6 @@ th {
 }
 
 .faq-body .nav a[aria-current="page"] {
-  padding-right: 16px;
-  padding-left: 16px;
   background: #e8edff;
   color: var(--primary-dark);
 }

@@ -1,6 +1,19 @@
 const THEME_STORAGE_KEY = 'planeja_theme';
 const root = document.documentElement;
 
+// Define o acesso ao link administrativo antes do primeiro desenho da pagina.
+function isStoredAdmin() {
+  try {
+    const user = JSON.parse(localStorage.getItem('planeja_user') || 'null');
+    return user?.perfil === 'admin' && user?.ativo !== false;
+  } catch (error) {
+    console.error('Não foi possível ler o perfil salvo do usuário.', error);
+    return false;
+  }
+}
+
+root.dataset.userIsAdmin = String(isStoredAdmin());
+
 function getStoredTheme() {
   try {
     return localStorage.getItem(THEME_STORAGE_KEY) === 'dark' ? 'dark' : 'light';

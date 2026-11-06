@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="./css/styles-extended.css" />
     <link rel="stylesheet" href="./css/theme.css" />
   </head>
-  <body class="app-page">
+  <body class="app-page admin-body">
     <header class="topbar">
       <a class="brand" href="./index.html" aria-label="Planeja+">
         <img src="./img/logo.png" alt="Planeja+" class="brand-logo brand-logo-light" />
@@ -32,7 +32,7 @@
       </nav>
     </header>
 
-    <main class="container">
+    <main class="container admin-page">
       <section class="page-heading">
         <p class="eyebrow">Administração</p>
         <h1>Painel do administrador</h1>
@@ -42,29 +42,31 @@
       <section class="stats-grid admin-stats">
         <article class="stat-card">
           <p class="stat-label">Usuários</p>
-          <strong id="total-usuarios">0</strong>
+          <strong id="total-usuarios">—</strong>
         </article>
         <article class="stat-card">
           <p class="stat-label">Usuários ativos</p>
-          <strong id="usuarios-ativos">0</strong>
+          <strong id="usuarios-ativos">—</strong>
         </article>
         <article class="stat-card">
           <p class="stat-label">Movimentações</p>
-          <strong id="total-movimentacoes">0</strong>
+          <strong id="total-movimentacoes">—</strong>
         </article>
         <article class="stat-card">
           <p class="stat-label">Receitas totais</p>
-          <strong id="total-receitas" class="positive">R$ 0,00</strong>
+          <strong id="total-receitas" class="positive">—</strong>
         </article>
         <article class="stat-card">
           <p class="stat-label">Despesas totais</p>
-          <strong id="total-despesas" class="negative">R$ 0,00</strong>
+          <strong id="total-despesas" class="negative">—</strong>
         </article>
       </section>
 
-      <section class="panel">
+      <section class="panel admin-users-panel">
         <h2>Usuários</h2>
         <p id="message" class="message" role="status"></p>
+        <!-- Explica carregamento e falhas de acesso sem tratar erros como dados zerados. -->
+        <p id="admin-status" class="admin-status" role="status" aria-live="polite">Carregando dados do painel...</p>
         <div class="table-wrap">
           <table class="admin-table">
             <thead>

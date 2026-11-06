@@ -1351,6 +1351,47 @@ th {
   background: rgba(86, 103, 217, 0.06);
 }
 
+/* Organiza os indicadores administrativos e mantém todos os valores legíveis. */
+.admin-page .admin-stats {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.admin-page .admin-stats .stat-card {
+  min-width: 0;
+}
+
+.admin-page .admin-stats .stat-card strong {
+  overflow-wrap: anywhere;
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
+}
+
+.admin-page .admin-users-panel h2 {
+  margin-top: 0;
+}
+
+.admin-page .admin-status {
+  min-height: 1.5em;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.admin-page .admin-table {
+  min-width: 860px;
+}
+
+.admin-page .admin-table .col-acoes {
+  min-width: 280px;
+  white-space: normal;
+}
+
+.admin-page .admin-table .col-acoes .button {
+  margin: 3px;
+}
+
+.admin-page .admin-table .tag {
+  text-transform: capitalize;
+}
+
 .app-page .faq-item {
   margin: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
